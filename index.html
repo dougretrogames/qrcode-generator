@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6d5dfc">
+<meta name="description" content="Gerador de QR Code 500x500 em PNG">
+<title>Gerador de QR Code</title>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+
+<style>
+:root {
+  --bg: #f4f5fb;
+  --card: #fff;
+  --text: #171827;
+  --muted: #707486;
+  --border: #e4e6ef;
+  --primary: #6d5dfc;
+  --dark: #171827;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 24px 16px;
+  display: grid;
+  place-items: center;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 10% 0%, #6d5dfc1f, transparent 32%),
+    radial-gradient(circle at 100% 100%, #6d5dfc17, transparent 30%),
+    var(--bg);
+}
+
+.app {
+  width: min(100%, 560px);
+  padding: 30px;
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: 0 18px 55px #1c1e341a;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: linear-gradient(135deg, var(--primary), #8b7fff);
+  box-shadow: 0 10px 25px #6d5dfc40;
+}
+
+.logo:before {
+  content: "";
+  width: 21px;
+  height: 21px;
+  border: 4px solid white;
+  border-radius: 3px;
+  box-shadow:
+    12px 0 0 -4px white,
+    0 12px 0 -4px white;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  letter-spacing: -.03em;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: .88rem;
+  font-weight: 650;
+}
+
+.counter {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  padding: 14px 44px 14px 15px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: #fafbfe;
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.45;
+  outline: 0;
+  transition: .2s;
+}
+
+textarea:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px #6d5dfc1c;
+}
+
+.clear {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #9296a5;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.clear:hover {
+  background: #eceef5;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+button.action {
+  flex: 1;
+  min-height: 46px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s;
+}
+
+.generate {
+  color: white;
+  background: linear-gradient(135deg, var(--primary), #7b6cff);
+  box-shadow: 0 8px 18px #6d5dfc38;
+}
+
+.generate:hover {
+  filter: brightness(.95);
+}
+
+.download {
+  display: none;
+  color: white;
+  background: var(--dark);
+}
+
+.download:hover {
+  background: #292b3b;
+}
+
+.preview {
+  display: none;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.preview.visible {
+  display: block;
+}
+
+.qr-frame {
+  width: min(100%, 500px);
+  aspect-ratio: 1;
+  margin: auto;
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 28px #1c1e341f;
+}
+
+.qr-frame canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.hint {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.footer {
+  margin-top: 22px;
+  text-align: center;
+  color: #9a9daa;
+  font-size: .76rem;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 14px;
+  }
+
+  .app {
+    padding: 22px 18px;
+    border-radius: 20px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+  <header class="header">
+    <div class="logo" aria-hidden="true"></div>
+
+    <h1>Gerador de QR Code</h1>
+
+    <p class="subtitle">
+      Crie seu QR Code em alta resolução e baixe em PNG.
+    </p>
+  </header>
+
+  <section>
+
+    <div class="label">
+      <label for="qr-text">Texto ou link</label>
+      <span id="counter" class="counter">0 caracteres</span>
+    </div>
+
+    <div class="input-wrap">
+
+      <textarea
+        id="qr-text"
+        maxlength="2000"
+        placeholder="Cole um link ou digite qualquer texto..."
+        autocomplete="off"
+        spellcheck="false"
+      ></textarea>
+
+      <button
+        class="clear"
+        id="clear"
+        type="button"
+        aria-label="Limpar"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div class="actions">
+
+      <button
+        class="action generate"
+        id="generate"
+        type="button"
+      >
+        Gerar QR Code
+      </button>
+
+      <button
+        class="action download"
+        id="download"
+        type="button"
+      >
+        Baixar PNG
+      </button>
+
+    </div>
+
+  </section>
+
+  <section
+    class="preview"
+    id="preview"
+    aria-label="Pré-visualização"
+  >
+
+    <div class="qr-frame">
+      <canvas
+        id="qr-canvas"
+        width="500"
+        height="500"
+      ></canvas>
+    </div>
+
+    <p class="hint">
+      PNG • 500 × 500 px • borda branca
+    </p>
+
+  </section>
+
+  <footer class="footer">
+    Seu conteúdo é processado localmente no navegador.
+  </footer>
+
+</main>
+
+<script>
+
+const input = document.getElementById('qr-text');
+const counter = document.getElementById('counter');
+const preview = document.getElementById('preview');
+const download = document.getElementById('download');
+const canvas = document.getElementById('qr-canvas');
+const ctx = canvas.getContext('2d', {
+  alpha: false
+});
+
+const SIZE = 500;
+const BORDER = 50;
+const QR_SIZE = 400;
+
+function count() {
+
+  const n = input.value.length;
+
+  counter.textContent =
+    `${n} ${n === 1 ? 'caractere' : 'caracteres'}`;
+
+}
+
+function generate() {
+
+  const text = input.value.trim();
+
+  if (!text) {
+    input.focus();
+    return;
+  }
+
+  try {
+
+    const qr = qrcode(0, 'H');
+
+    qr.addData(text);
+    qr.make();
+
+    const modules = qr.getModuleCount();
+    const unit = QR_SIZE / modules;
+
+    /*
+     * Fundo branco.
+     * O QR ocupa 400x400 pixels,
+     * deixando 50px de borda em cada lado.
+     */
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    ctx.fillStyle = '#000';
+
+    for (let row = 0; row < modules; row++) {
+
+      for (let col = 0; col < modules; col++) {
+
+        if (!qr.isDark(row, col)) {
+          continue;
+        }
+
+        const x =
+          Math.round(BORDER + col * unit);
+
+        const y =
+          Math.round(BORDER + row * unit);
+
+        const nextX =
+          Math.round(BORDER + (col + 1) * unit);
+
+        const nextY =
+          Math.round(BORDER + (row + 1) * unit);
+
+        ctx.fillRect(
+          x,
+          y,
+          nextX - x,
+          nextY - y
+        );
+
+      }
+
+    }
+
+    preview.classList.add('visible');
+    download.style.display = 'block';
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      'Não foi possível gerar o QR Code. ' +
+      'Tente usar um texto menor.'
+    );
+
+  }
+
+}
+
+function save() {
+
+  const a = document.createElement('a');
+
+  a.download = 'qrcode-500x500.png';
+
+  a.href = canvas.toDataURL('image/png');
+
+  a.click();
+
+}
+
+input.addEventListener('input', count);
+
+input.addEventListener('keydown', event => {
+
+  if (
+    (event.ctrlKey || event.metaKey) &&
+    event.key === 'Enter'
+  ) {
+    generate();
+  }
+
+});
+
+document.getElementById('clear').onclick = () => {
+
+  input.value = '';
+
+  count();
+
+  preview.classList.remove('visible');
+
+  download.style.display = 'none';
+
+  input.focus();
+
+};
+
+document.getElementById('generate').onclick = generate;
+
+download.onclick = save;
+
+count();
+
+</script>
+
+</body>
+</html>
