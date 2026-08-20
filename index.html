@@ -571,21 +571,21 @@ input[type="range"] {
         </div>
 
         <div class="field">
-          <label class="field-label">Posição do frame</label>
+          <label class="field-label">Posição da moldura</label>
 
           <div id="frames" class="frames">
-            <button class="frame-btn active" data-frame="none" type="button">Nenhum</button>
+            <button class="frame-btn active" data-frame="none" type="button">Nenhuma</button>
             <button class="frame-btn" data-frame="top" type="button">Superior</button>
             <button class="frame-btn" data-frame="bottom" type="button">Inferior</button>
             <button class="frame-btn" data-frame="left" type="button">Lateral esq.</button>
             <button class="frame-btn" data-frame="right" type="button">Lateral dir.</button>
-            <button class="frame-btn" data-frame="full" type="button">Completo</button>
+            <button class="frame-btn" data-frame="full" type="button">Completa</button>
           </div>
         </div>
 
         <div id="thickness" class="field thickness">
           <label class="field-label" for="thickness-input">
-            Espessura do frame —
+            Espessura da moldura —
             <span id="thickness-value" class="thickness-value">56</span> px
           </label>
 
@@ -602,23 +602,32 @@ input[type="range"] {
         <div id="frame-options" class="frame-options">
           <div class="grid">
             <div class="field">
-              <label class="field-label" for="frame-text">Texto do frame</label>
+              <label class="field-label" for="frame-text">Texto da moldura</label>
               <input id="frame-text" value="Acesse aqui" maxlength="70">
             </div>
 
             <div class="field">
-              <label class="field-label" for="frame-color">Cor do frame</label>
+              <label class="field-label" for="frame-color">Cor da moldura</label>
 
               <div class="hex-row">
                 <input id="frame-picker" class="color-picker" type="color" value="#6D5DFC">
                 <input id="frame-color" class="hex-input" value="#6D5DFC" maxlength="7">
               </div>
             </div>
+
+            <div class="field">
+              <label class="field-label" for="frame-text-color">Cor do texto da moldura</label>
+
+              <div class="hex-row">
+                <input id="frame-text-color-picker" class="color-picker" type="color" value="#FFFFFF">
+                <input id="frame-text-color" class="hex-input" value="#FFFFFF" maxlength="7">
+              </div>
+            </div>
           </div>
 
           <label class="check">
             <input id="rounded-frame" type="checkbox">
-            Cantos arredondados
+            Cantos arredondados da moldura
           </label>
         </div>
 
@@ -670,13 +679,6 @@ const actions = $("actions");
 const GAP = 10;
 const FONT_FAMILY = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
 
-/*
-  A referência é 125 px:
-  - QR de 125 px: borda de 2 px.
-  - QR de 250 px: borda de 4 px.
-  - QR de 500 px: borda de 8 px.
-  - QR de 1000 px: borda de 16 px.
-*/
 const ICON_BORDER_BASE_QR_SIZE = 125;
 const ICON_BORDER_BASE_THICKNESS = 2;
 
@@ -747,7 +749,7 @@ function getIconBorderThickness() {
 
 function getIconContentPadding() {
   const paddingBySize = {
-    125: 3,
+    125: 2,
     250: 6,
     375: 9,
     500: 12,
@@ -1133,32 +1135,9 @@ async function drawSocialIcon(context) {
 
   const pixelStyle = $("style").value;
 
-  /*
-    O ícone também acompanha proporcionalmente o QR.
-    Ex.: 125 px => ícone de 25 px
-         500 px => ícone de 100 px
-        1000 px => ícone de 200 px
-  */
   const iconSize = Math.round(size * 0.20);
-
-  /*
-    Borda proporcional:
-    125 px => 2 px
-    250 px => 4 px
-    375 px => 6 px
-    500 px => 8 px
-    625 px => 10 px
-    750 px => 12 px
-    875 px => 14 px
-   1000 px => 16 px
-  */
   const whiteBorder = getIconBorderThickness();
   const blackBorder = getIconBorderThickness();
-
-  /*
-    Espaçamento interno também aumenta junto do QR Code.
-    No QR de 125 px, o mínimo é 6 px.
-  */
   const contentPadding = getIconContentPadding();
 
   const totalPadding =
@@ -1175,9 +1154,6 @@ async function drawSocialIcon(context) {
   const outerX = Math.round(center - outerSize / 2);
   const outerY = Math.round(center - outerSize / 2);
 
-  /*
-    Moldura branca externa.
-  */
   context.fillStyle = "#FFFFFF";
 
   drawIconFrameShape(
@@ -1192,9 +1168,6 @@ async function drawSocialIcon(context) {
 
   context.fill();
 
-  /*
-    Moldura preta interna.
-  */
   context.fillStyle = "#000000";
 
   drawIconFrameShape(
@@ -1209,9 +1182,6 @@ async function drawSocialIcon(context) {
 
   context.fill();
 
-  /*
-    Fundo branco de proteção do ícone.
-  */
   context.fillStyle = "#FFFFFF";
 
   drawIconFrameShape(
@@ -1275,6 +1245,10 @@ async function render() {
     ? $("frame-color").value.toUpperCase()
     : "#6D5DFC";
 
+  const frameTextColor = isHex($("frame-text-color").value)
+    ? $("frame-text-color").value.toUpperCase()
+    : "#FFFFFF";
+
   const frameText = $("frame-text").value.trim() || "Acesse aqui";
   const roundedFrame = $("rounded-frame").checked;
 
@@ -1292,7 +1266,7 @@ async function render() {
 
     ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, size, size);
 
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = frameTextColor;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -1322,7 +1296,7 @@ async function render() {
       ctx.fillRect(x, y, width, height);
     }
 
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = frameTextColor;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -1508,6 +1482,8 @@ bindColor("bg", "bg-picker", value => {
 });
 
 bindColor("frame-color", "frame-picker", () => {});
+
+bindColor("frame-text-color", "frame-text-color-picker", () => {});
 
 $("icon-enabled").addEventListener("change", event => {
   const enabled = event.target.checked;
