@@ -670,6 +670,16 @@ const actions = $("actions");
 const GAP = 10;
 const FONT_FAMILY = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
 
+/*
+  A referência é 125 px:
+  - QR de 125 px: borda de 2 px.
+  - QR de 250 px: borda de 4 px.
+  - QR de 500 px: borda de 8 px.
+  - QR de 1000 px: borda de 16 px.
+*/
+const ICON_BORDER_BASE_QR_SIZE = 125;
+const ICON_BORDER_BASE_THICKNESS = 2;
+
 let size = 500;
 let fg = "#000000";
 let bg = "#FFFFFF";
@@ -723,6 +733,23 @@ function getDefaultFrameThickness(qrSize = size) {
 
 function getTextFont(fontSize) {
   return `700 ${Math.round(fontSize)}px ${FONT_FAMILY}`;
+}
+
+function getIconBorderThickness() {
+  return Math.max(
+    ICON_BORDER_BASE_THICKNESS,
+    Math.round(
+      (size / ICON_BORDER_BASE_QR_SIZE) *
+      ICON_BORDER_BASE_THICKNESS
+    )
+  );
+}
+
+function getIconContentPadding() {
+  return Math.max(
+    6,
+    Math.round(size * 0.048)
+  );
 }
 
 function isHex(value) {
@@ -1063,20 +1090,26 @@ function drawIconFrameShape(context, x, y, width, height, style, layer) {
   }
 
   if (style === "rounded") {
-    const radius = layer === "outer"
-      ? width * 0.26
-      : width * 0.22;
-
-    roundedRect(context, x, y, width, height, radius);
+    roundedRect(
+      context,
+      x,
+      y,
+      width,
+      height,
+      layer === "outer" ? width * 0.26 : width * 0.22
+    );
     return;
   }
 
   if (style === "soft") {
-    const radius = layer === "outer"
-      ? width * 0.14
-      : width * 0.11;
-
-    roundedRect(context, x, y, width, height, radius);
+    roundedRect(
+      context,
+      x,
+      y,
+      width,
+      height,
+      layer === "outer" ? width * 0.14 : width * 0.11
+    );
     return;
   }
 
@@ -1092,18 +1125,51 @@ async function drawSocialIcon(context) {
 
   const pixelStyle = $("style").value;
 
+  /*
+    O ícone também acompanha proporcionalmente o QR.
+    Ex.: 125 px => ícone de 25 px
+         500 px => ícone de 100 px
+        1000 px => ícone de 200 px
+  */
   const iconSize = Math.round(size * 0.20);
-  const whiteBorder = 4;
-  const blackBorder = 4;
-  const contentPadding = Math.max(6, Math.round(size * 0.012));
 
-  const totalPadding = whiteBorder + blackBorder + contentPadding;
-  const outerSize = iconSize + totalPadding * 2;
+  /*
+    Borda proporcional:
+    125 px => 2 px
+    250 px => 4 px
+    375 px => 6 px
+    500 px => 8 px
+    625 px => 10 px
+    750 px => 12 px
+    875 px => 14 px
+   1000 px => 16 px
+  */
+  const whiteBorder = getIconBorderThickness();
+  const blackBorder = getIconBorderThickness();
+
+  /*
+    Espaçamento interno também aumenta junto do QR Code.
+    No QR de 125 px, o mínimo é 6 px.
+  */
+  const contentPadding = getIconContentPadding();
+
+  const totalPadding =
+    whiteBorder +
+    blackBorder +
+    contentPadding;
+
+  const outerSize =
+    iconSize +
+    totalPadding * 2;
 
   const center = size / 2;
+
   const outerX = Math.round(center - outerSize / 2);
   const outerY = Math.round(center - outerSize / 2);
 
+  /*
+    Moldura branca externa.
+  */
   context.fillStyle = "#FFFFFF";
 
   drawIconFrameShape(
@@ -1118,6 +1184,9 @@ async function drawSocialIcon(context) {
 
   context.fill();
 
+  /*
+    Moldura preta interna.
+  */
   context.fillStyle = "#000000";
 
   drawIconFrameShape(
@@ -1132,6 +1201,9 @@ async function drawSocialIcon(context) {
 
   context.fill();
 
+  /*
+    Fundo branco de proteção do ícone.
+  */
   context.fillStyle = "#FFFFFF";
 
   drawIconFrameShape(
@@ -1157,7 +1229,7 @@ async function drawSocialIcon(context) {
       iconSize
     );
   } catch {
-    /* Mantém o QR funcional se o CDN estiver indisponível. */
+    /* Mantém o QR funcional se algum ícone não carregar. */
   }
 }
 
@@ -1284,6 +1356,7 @@ async function updatePreview() {
   if ($("qr-text").value.trim()) {
     preview.classList.add("visible");
     actions.classList.add("visible");
+
     await render();
   } else {
     preview.classList.remove("visible");
