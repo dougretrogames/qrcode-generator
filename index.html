@@ -23,13 +23,7 @@
     --background: #12131c;
     --card: #1b1c29;
     --text: #f2f2f7;
-    --muted: #9498a8#qr-canvas {
-  display: block;
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  margin: auto;
-}
+    --muted: #9498a8;
     --border: #2c2e40;
   }
   input, select, textarea, .frame-button, .social-button {
@@ -165,14 +159,15 @@ input[type="range"] {
 }
 .ecc-notice.visible { display: block; }
 
-.actions { display: flex; gap: 10px; margin-top: 18px; position: sticky; bottom: max(10px, env(safe-area-inset-bottom)); }
+.actions { display: flex; gap: 10px; margin-top: 18px; }
 .action-button {
   flex: 1; min-height: 50px; border: none; border-radius: 12px; font: inherit; font-weight: 750; cursor: pointer;
   transition: transform .12s, opacity .2s; -webkit-tap-highlight-color: transparent;
 }
 .action-button:active { transform: scale(0.97); }
 
-.download-button { color: white; background: linear-gradient(135deg, #6D5DFC, #7B6CFF); box-shadow: 0 8px 18px #6D5DFC38; }
+.download-button { display: none; color: white; background: linear-gradient(135deg, #6D5DFC, #7B6CFF); box-shadow: 0 8px 18px #6D5DFC38; }
+.share-button { display: none; color: white; background: #171827; }
 
 .preview { display: none; margin-top: 23px; padding-top: 23px; border-top: 1px solid var(--border); text-align: center; }
 .preview.visible { display: block; animation: fadeIn .35s ease; }
@@ -188,11 +183,16 @@ input[type="range"] {
   .app { padding: 20px 16px; border-radius: 18px; }
   .grid { grid-template-columns: 1fr; }
   .social-grid { grid-template-columns: repeat(2, 1fr); }
-  .actions { flex-direction: column; position: static; }
+  .actions { flex-direction: column; }
 }
 
 @media (min-width: 900px) {
   body { display: flex; align-items: center; }
+  .app { width: min(100%, 980px); }
+  .app-inner { display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start; }
+  .preview { margin-top: 0; padding-top: 0; border-top: none; }
+  .preview-container { padding: 0; }
+  .actions { margin-top: 14px; }
 }
 </style>
 </head>
@@ -204,143 +204,150 @@ input[type="range"] {
     <p class="subtitle">Crie, personalize e baixe seu QR Code em PNG — com pré-visualização em tempo real.</p>
   </header>
 
-  <div class="label">
-    <label for="qr-text">Texto ou link</label>
-    <span id="counter" class="counter">0 caracteres</span>
-  </div>
-
-  <div class="input-wrapper">
-    <textarea id="qr-text" maxlength="2000" placeholder="Cole um link ou digite qualquer texto..." spellcheck="false"></textarea>
-    <button id="clear-button" class="clear-button" type="button" aria-label="Limpar">×</button>
-  </div>
-
-  <section class="customization">
-    <div class="section-title">Personalização</div>
-
-    <div class="grid">
-      <div class="field">
-        <label class="field-label">Formato dos pixels</label>
-        <select id="module-style" aria-label="Formato dos pixels">
-          <option value="square">Quadrado</option>
-          <option value="rounded">Arredondado</option>
-          <option value="dot">Pontos</option>
-          <option value="soft">Arredondado suave</option>
-          <option value="circle">Círculo</option>
-        </select>
+  <div class="app-inner">
+    <div class="controls-column">
+      <div class="label">
+        <label for="qr-text">Texto ou link</label>
+        <span id="counter" class="counter">0 caracteres</span>
       </div>
-      <div class="field">
-        <label class="field-label">Correção de erro</label>
-        <select id="error-level" aria-label="Correção de erro">
-          <option value="H">Alta — H</option>
-          <option value="Q">Boa — Q</option>
-          <option value="M">Média — M</option>
-          <option value="L">Baixa — L</option>
-        </select>
-      </div>
-    </div>
 
-    <div class="field">
-      <label class="field-label">Cores predefinidas</label>
-      <div class="swatches" role="group" aria-label="Cores predefinidas">
-        <button class="swatch active" data-color="#000000" style="background:#000000" aria-label="Preto"></button>
-        <button class="swatch" data-color="#1F2937" style="background:#1F2937" aria-label="Cinza escuro"></button>
-        <button class="swatch" data-color="#2563EB" style="background:#2563EB" aria-label="Azul"></button>
-        <button class="swatch" data-color="#6D5DFC" style="background:#6D5DFC" aria-label="Roxo"></button>
-        <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" aria-label="Violeta"></button>
-        <button class="swatch" data-color="#DB2777" style="background:#DB2777" aria-label="Rosa"></button>
-        <button class="swatch" data-color="#DC2626" style="background:#DC2626" aria-label="Vermelho"></button>
-        <button class="swatch" data-color="#EA580C" style="background:#EA580C" aria-label="Laranja"></button>
-        <button class="swatch" data-color="#16A34A" style="background:#16A34A" aria-label="Verde"></button>
-        <button class="swatch" data-color="#0891B2" style="background:#0891B2" aria-label="Ciano"></button>
+      <div class="input-wrapper">
+        <textarea id="qr-text" maxlength="2000" placeholder="Cole um link ou digite qualquer texto..." spellcheck="false"></textarea>
+        <button id="clear-button" class="clear-button" type="button" aria-label="Limpar">×</button>
       </div>
-    </div>
 
-    <div class="grid">
-      <div class="field">
-        <label class="field-label">Cor do QR — HEX</label>
-        <div class="hex-row">
-          <input id="qr-color-picker" class="color-picker" type="color" value="#000000" aria-label="Seletor de cor do QR">
-          <input id="qr-color" class="hex-input" type="text" value="#000000" maxlength="7" inputmode="text">
-        </div>
-      </div>
-      <div class="field">
-        <label class="field-label">Cor do fundo — HEX</label>
-        <div class="hex-row">
-          <input id="bg-color-picker" class="color-picker" type="color" value="#FFFFFF" aria-label="Seletor de cor do fundo">
-          <input id="bg-color" class="hex-input" type="text" value="#FFFFFF" maxlength="7" inputmode="text">
-        </div>
-      </div>
-    </div>
+      <section class="customization">
+        <div class="section-title">Personalização</div>
 
-    <div class="field">
-      <label class="field-label">Posição do frame</label>
-      <div class="frames">
-        <button class="frame-button active" data-frame="none">Nenhum</button>
-        <button class="frame-button" data-frame="top">Superior</button>
-        <button class="frame-button" data-frame="bottom">Inferior</button>
-        <button class="frame-button" data-frame="left">Lateral esq.</button>
-        <button class="frame-button" data-frame="right">Lateral dir.</button>
-        <button class="frame-button" data-frame="full">Completo</button>
-      </div>
-    </div>
-
-    <div id="thickness-field" class="field thickness-field">
-      <label class="field-label" for="frame-thickness">Espessura do frame — <span id="thickness-value" class="thickness-value">56</span> px</label>
-      <input type="range" id="frame-thickness" min="24" max="120" value="56" step="2">
-    </div>
-
-    <div id="frame-options" class="frame-options">
-      <div class="grid">
-        <div class="field">
-          <label class="field-label">Texto do frame</label>
-          <input id="frame-text" type="text" value="Acesse aqui" maxlength="70">
-        </div>
-        <div class="field">
-          <label class="field-label">Cor do frame</label>
-          <div class="hex-row">
-            <input id="frame-color-picker" class="color-picker" type="color" value="#6D5DFC" aria-label="Seletor de cor do frame">
-            <input id="frame-color" class="hex-input" type="text" value="#6D5DFC" maxlength="7">
+        <div class="grid">
+          <div class="field">
+            <label class="field-label">Formato dos pixels</label>
+            <select id="module-style" aria-label="Formato dos pixels">
+              <option value="square">Quadrado</option>
+              <option value="rounded">Arredondado</option>
+              <option value="dot">Pontos</option>
+              <option value="soft">Arredondado suave</option>
+              <option value="circle">Círculo</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Correção de erro</label>
+            <select id="error-level" aria-label="Correção de erro">
+              <option value="H">Alta — H</option>
+              <option value="Q">Boa — Q</option>
+              <option value="M">Média — M</option>
+              <option value="L">Baixa — L</option>
+            </select>
           </div>
         </div>
-      </div>
 
-      <div class="field checkbox-field">
-        <label>
-          <input type="checkbox" id="frame-rounded">
-          Cantos arredondados
-        </label>
-      </div>
-    </div>
-
-    <div class="icon-options">
-      <div class="field checkbox-field">
-        <label>
-          <input type="checkbox" id="icon-enabled">
-          Adicionar ícone social sobre o QR Code
-        </label>
-      </div>
-
-      <div id="ecc-notice" class="ecc-notice">
-        Correção de erro elevada para H automaticamente para garantir a leitura com o logo.
-      </div>
-
-      <div id="social-options" style="display:none">
         <div class="field">
-          <label class="field-label">Rede social</label>
-          <div class="social-grid" id="social-grid"></div>
+          <label class="field-label">Cores predefinidas</label>
+          <div class="swatches" role="group" aria-label="Cores predefinidas">
+            <button class="swatch active" data-color="#000000" style="background:#000000" aria-label="Preto"></button>
+            <button class="swatch" data-color="#1F2937" style="background:#1F2937" aria-label="Cinza escuro"></button>
+            <button class="swatch" data-color="#2563EB" style="background:#2563EB" aria-label="Azul"></button>
+            <button class="swatch" data-color="#6D5DFC" style="background:#6D5DFC" aria-label="Roxo"></button>
+            <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" aria-label="Violeta"></button>
+            <button class="swatch" data-color="#DB2777" style="background:#DB2777" aria-label="Rosa"></button>
+            <button class="swatch" data-color="#DC2626" style="background:#DC2626" aria-label="Vermelho"></button>
+            <button class="swatch" data-color="#EA580C" style="background:#EA580C" aria-label="Laranja"></button>
+            <button class="swatch" data-color="#16A34A" style="background:#16A34A" aria-label="Verde"></button>
+            <button class="swatch" data-color="#0891B2" style="background:#0891B2" aria-label="Ciano"></button>
+          </div>
         </div>
+
+        <div class="grid">
+          <div class="field">
+            <label class="field-label">Cor do QR — HEX</label>
+            <div class="hex-row">
+              <input id="qr-color-picker" class="color-picker" type="color" value="#000000" aria-label="Seletor de cor do QR">
+              <input id="qr-color" class="hex-input" type="text" value="#000000" maxlength="7" inputmode="text">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Cor do fundo — HEX</label>
+            <div class="hex-row">
+              <input id="bg-color-picker" class="color-picker" type="color" value="#FFFFFF" aria-label="Seletor de cor do fundo">
+              <input id="bg-color" class="hex-input" type="text" value="#FFFFFF" maxlength="7" inputmode="text">
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Posição do frame</label>
+          <div class="frames">
+            <button class="frame-button active" data-frame="none">Nenhum</button>
+            <button class="frame-button" data-frame="top">Superior</button>
+            <button class="frame-button" data-frame="bottom">Inferior</button>
+            <button class="frame-button" data-frame="left">Lateral esq.</button>
+            <button class="frame-button" data-frame="right">Lateral dir.</button>
+            <button class="frame-button" data-frame="full">Completo</button>
+          </div>
+        </div>
+
+        <div id="thickness-field" class="field thickness-field">
+          <label class="field-label" for="frame-thickness">Espessura do frame — <span id="thickness-value" class="thickness-value">56</span> px</label>
+          <input type="range" id="frame-thickness" min="24" max="120" value="56" step="2">
+        </div>
+
+        <div id="frame-options" class="frame-options">
+          <div class="grid">
+            <div class="field">
+              <label class="field-label">Texto do frame</label>
+              <input id="frame-text" type="text" value="Acesse aqui" maxlength="70">
+            </div>
+            <div class="field">
+              <label class="field-label">Cor do frame</label>
+              <div class="hex-row">
+                <input id="frame-color-picker" class="color-picker" type="color" value="#6D5DFC" aria-label="Seletor de cor do frame">
+                <input id="frame-color" class="hex-input" type="text" value="#6D5DFC" maxlength="7">
+              </div>
+            </div>
+          </div>
+
+          <div class="field checkbox-field">
+            <label>
+              <input type="checkbox" id="frame-rounded">
+              Cantos arredondados
+            </label>
+          </div>
+        </div>
+
+        <div class="icon-options">
+          <div class="field checkbox-field">
+            <label>
+              <input type="checkbox" id="icon-enabled">
+              Adicionar ícone social sobre o QR Code
+            </label>
+          </div>
+
+          <div id="ecc-notice" class="ecc-notice">
+            Correção de erro elevada para H automaticamente para garantir a leitura com o logo.
+          </div>
+
+          <div id="social-options" style="display:none">
+            <div class="field">
+              <label class="field-label">Rede social</label>
+              <div class="social-grid" id="social-grid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="preview-column">
+      <section id="preview" class="preview">
+        <div class="preview-container"><canvas id="qr-canvas"></canvas></div>
+        <p id="preview-info" class="preview-info"></p>
+      </section>
+
+      <div class="actions">
+        <button id="download-button" class="action-button download-button">Baixar PNG</button>
+        <button id="share-button" class="action-button share-button">Compartilhar</button>
       </div>
     </div>
-  </section>
-
-  <div class="actions">
-    <button id="download-button" class="action-button download-button">Baixar PNG</button>
   </div>
-
-  <section id="preview" class="preview">
-    <div class="preview-container"><canvas id="qr-canvas"></canvas></div>
-    <p id="preview-info" class="preview-info"></p>
-  </section>
 
   <footer class="footer">Tudo é processado localmente no navegador. Ícones oficiais via Simple Icons (CC0).</footer>
 </main>
@@ -357,6 +364,7 @@ const canvas = document.getElementById("qr-canvas");
 const ctx = canvas.getContext("2d");
 const preview = document.getElementById("preview");
 const downloadButton = document.getElementById("download-button");
+const shareButton = document.getElementById("share-button");
 
 let qrColor = "#000000";
 let backgroundColor = "#FFFFFF";
@@ -624,7 +632,6 @@ async function render() {
   canvas.style.width = "100%";
   canvas.style.maxWidth = layout.width + "px";
   canvas.style.aspectRatio = `${layout.width} / ${layout.height}`;
-  canvas.removeAttribute("style-height");
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
   const frameColor = isValidHex(document.getElementById("frame-color").value)
@@ -706,14 +713,33 @@ function downloadQRCode() {
   document.body.removeChild(link);
 }
 
+async function shareQRCode() {
+  if (!canvas.width) return;
+  try {
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    const file = new File([blob], `qrcode-${canvas.width}x${canvas.height}.png`, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "QR Code" });
+    } else {
+      alert("Compartilhamento de arquivos não suportado neste navegador. Use o botão Baixar PNG.");
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      alert("Não foi possível compartilhar. Tente baixar o PNG.");
+    }
+  }
+}
+
 async function updatePreview() {
   if (input.value.trim()) {
     preview.classList.add("visible");
     downloadButton.style.display = "block";
+    shareButton.style.display = "block";
     await render();
   } else {
     preview.classList.remove("visible");
     downloadButton.style.display = "none";
+    shareButton.style.display = "none";
   }
 }
 
@@ -733,6 +759,7 @@ input.addEventListener("blur", function () {
 });
 
 downloadButton.addEventListener("click", downloadQRCode);
+shareButton.addEventListener("click", shareQRCode);
 
 document.getElementById("clear-button").addEventListener("click", function () {
   input.value = "";
@@ -740,6 +767,7 @@ document.getElementById("clear-button").addEventListener("click", function () {
   clearTimeout(renderTimeout);
   preview.classList.remove("visible");
   downloadButton.style.display = "none";
+  shareButton.style.display = "none";
   input.focus();
 });
 
