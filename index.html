@@ -108,6 +108,11 @@ input, select {
   border-radius: 10px; background: #fafbfe; color: var(--text); font: inherit; font-size: 16px; outline: none;
 }
 
+input[type="range"] {
+  height: auto; padding: 0; border: none; background: transparent;
+  accent-color: var(--primary); cursor: pointer;
+}
+
 .swatches { display: flex; flex-wrap: wrap; gap: 10px; }
 .swatch {
   width: 36px; height: 36px; border: 2px solid white; outline: 1px solid #d9dbe4;
@@ -128,6 +133,10 @@ input, select {
 }
 .frame-button:active { transform: scale(0.96); }
 .frame-button.active { border-color: var(--primary); color: var(--primary); background: #6D5DFC0D; box-shadow: inset 0 0 0 1px var(--primary); }
+
+.thickness-field { display: none; }
+.thickness-field.visible { display: block; }
+.thickness-value { color: var(--primary); font-weight: 800; }
 
 .checkbox-field label { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 0.86rem; font-weight: 650; }
 .checkbox-field input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--primary); cursor: pointer; }
@@ -157,7 +166,6 @@ input, select {
 }
 .action-button:active { transform: scale(0.97); }
 
-.generate-button { color: white; background: linear-gradient(135deg, #6D5DFC, #7B6CFF); box-shadow: 0 8px 18px #6D5DFC38; }
 .download-button { display: none; color: white; background: #171827; }
 
 .preview { display: none; margin-top: 23px; padding-top: 23px; border-top: 1px solid var(--border); text-align: center; }
@@ -165,7 +173,7 @@ input, select {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 .preview-container { overflow: auto; padding: 5px; }
-#qr-canvas { display: block; width: auto; max-width: 100%; height: auto; margin: auto; border-radius: 8px; box-shadow: 0 10px 28px rgba(28, 30, 52, 0.12); }
+#qr-canvas { display: block; width: auto; max-width: 100%; height: auto; margin: auto; }
 .preview-info { margin-top: 11px; color: var(--muted); font-size: 0.8rem; }
 
 .footer { margin-top: 20px; text-align: center; color: #9a9daa; font-size: 0.75rem; }
@@ -270,6 +278,11 @@ input, select {
       </div>
     </div>
 
+    <div id="thickness-field" class="field thickness-field">
+      <label class="field-label" for="frame-thickness">Espessura do frame — <span id="thickness-value" class="thickness-value">56</span> px</label>
+      <input type="range" id="frame-thickness" min="24" max="120" value="56" step="2">
+    </div>
+
     <div id="frame-options" class="frame-options">
       <div class="grid">
         <div class="field">
@@ -315,7 +328,6 @@ input, select {
   </section>
 
   <div class="actions">
-    <button id="generate-button" class="action-button generate-button">Gerar QR Code</button>
     <button id="download-button" class="action-button download-button">Baixar PNG</button>
   </div>
 
@@ -331,9 +343,8 @@ input, select {
 const QR_SIZE = 500;
 const QR_MARGIN = 15;
 const GAP = 10;
-const BAR_THICK = 56;
-const RING_THICK = 20;
-const BOTTOM_TEXT_H = 70;
+const DPR = Math.min(window.devicePixelRatio || 1, 3);
+const FONT_FAMILY = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
 
 const input = document.getElementById("qr-text");
 const canvas = document.getElementById("qr-canvas");
@@ -346,11 +357,11 @@ let backgroundColor = "#FFFFFF";
 let currentFrame = "none";
 let currentSocial = null;
 let iconEnabled = false;
+let frameThickness = 56;
 let renderTimeout = null;
 
 /* Ícones oficiais (fonte: Simple Icons, CC0).
-   WhatsApp usa dois paths: balão verde + telefone branco explícito,
-   garantindo o contraste exigido pelas diretrizes de marca da Meta. */
+   WhatsApp usa dois paths: balão verde + telefone branco explícito. */
 const SOCIAL_ICONS = {
   whatsapp: {
     color: "#25D366",
@@ -412,13 +423,15 @@ function generateBaseQR() {
   qr.make();
   const modules = qr.getModuleCount();
   const usableSize = QR_SIZE - (QR_MARGIN * 2);
-  const moduleSize = usableSize / modules;
+  const moduleSize = (usableSize / modules) * DPR;
+  const margin = QR_MARGIN * DPR;
+  const totalSize = QR_SIZE * DPR;
   const qrCanvas = document.createElement("canvas");
-  qrCanvas.width = QR_SIZE;
-  qrCanvas.height = QR_SIZE;
+  qrCanvas.width = totalSize;
+  qrCanvas.height = totalSize;
   const qrCtx = qrCanvas.getContext("2d");
   qrCtx.fillStyle = backgroundColor;
-  qrCtx.fillRect(0, 0, QR_SIZE, QR_SIZE);
+  qrCtx.fillRect(0, 0, totalSize, totalSize);
   qrCtx.fillStyle = qrColor;
 
   const finderZones = [
@@ -432,15 +445,15 @@ function generateBaseQR() {
     for (let col = 0; col < modules; col++) {
       if (!qr.isDark(row, col)) continue;
       if (inFinderZone(row, col)) continue;
-      const x = QR_MARGIN + col * moduleSize;
-      const y = QR_MARGIN + row * moduleSize;
+      const x = margin + col * moduleSize;
+      const y = margin + row * moduleSize;
       drawModule(qrCtx, x, y, moduleSize, style);
     }
   }
 
   finderZones.forEach(zone => {
-    const x = QR_MARGIN + zone.c0 * moduleSize;
-    const y = QR_MARGIN + zone.r0 * moduleSize;
+    const x = margin + zone.c0 * moduleSize;
+    const y = margin + zone.r0 * moduleSize;
     drawFinderPattern(qrCtx, x, y, moduleSize, style, qrColor, backgroundColor);
   });
 
@@ -523,10 +536,10 @@ function roundedRect(context, x, y, width, height, radius) {
 
 function fitText(context, text, maxWidth, initialSize) {
   let size = initialSize;
-  context.font = `700 ${size}px Arial`;
+  context.font = `700 ${size}px ${FONT_FAMILY}`;
   while (context.measureText(text).width > maxWidth && size > 10) {
     size--;
-    context.font = `700 ${size}px Arial`;
+    context.font = `700 ${size}px ${FONT_FAMILY}`;
   }
   return size;
 }
@@ -534,22 +547,25 @@ function fitText(context, text, maxWidth, initialSize) {
 function isRounded() { return document.getElementById("frame-rounded").checked; }
 
 function computeLayout(position) {
+  const thick = frameThickness;
+  const ring = Math.round(thick * 0.36);
+  const bottomH = thick + 16;
   switch (position) {
     case "top":
-      return { width: QR_SIZE, height: QR_SIZE + GAP + BAR_THICK, qrX: 0, qrY: BAR_THICK + GAP,
-        bar: { x: 0, y: 0, w: QR_SIZE, h: BAR_THICK }, orientation: "h" };
+      return { width: QR_SIZE, height: QR_SIZE + GAP + thick, qrX: 0, qrY: thick + GAP,
+        bar: { x: 0, y: 0, w: QR_SIZE, h: thick }, orientation: "h" };
     case "bottom":
-      return { width: QR_SIZE, height: QR_SIZE + GAP + BAR_THICK, qrX: 0, qrY: 0,
-        bar: { x: 0, y: QR_SIZE + GAP, w: QR_SIZE, h: BAR_THICK }, orientation: "h" };
+      return { width: QR_SIZE, height: QR_SIZE + GAP + thick, qrX: 0, qrY: 0,
+        bar: { x: 0, y: QR_SIZE + GAP, w: QR_SIZE, h: thick }, orientation: "h" };
     case "left":
-      return { width: QR_SIZE + GAP + BAR_THICK, height: QR_SIZE, qrX: BAR_THICK + GAP, qrY: 0,
-        bar: { x: 0, y: 0, w: BAR_THICK, h: QR_SIZE }, orientation: "v", rotate: -1 };
+      return { width: QR_SIZE + GAP + thick, height: QR_SIZE, qrX: thick + GAP, qrY: 0,
+        bar: { x: 0, y: 0, w: thick, h: QR_SIZE }, orientation: "v", rotate: -1 };
     case "right":
-      return { width: QR_SIZE + GAP + BAR_THICK, height: QR_SIZE, qrX: 0, qrY: 0,
-        bar: { x: QR_SIZE + GAP, y: 0, w: BAR_THICK, h: QR_SIZE }, orientation: "v", rotate: 1 };
+      return { width: QR_SIZE + GAP + thick, height: QR_SIZE, qrX: 0, qrY: 0,
+        bar: { x: QR_SIZE + GAP, y: 0, w: thick, h: QR_SIZE }, orientation: "v", rotate: 1 };
     case "full":
-      return { width: QR_SIZE + RING_THICK * 2, height: RING_THICK + QR_SIZE + BOTTOM_TEXT_H,
-        qrX: RING_THICK, qrY: RING_THICK, full: true };
+      return { width: QR_SIZE + ring * 2, height: ring + QR_SIZE + bottomH,
+        qrX: ring, qrY: ring, full: true, bottomH: bottomH };
     default:
       return { width: QR_SIZE, height: QR_SIZE, qrX: 0, qrY: 0 };
   }
@@ -570,11 +586,12 @@ function drawIconOverlay(qrCtx) {
   const image = new Image();
   return new Promise(resolve => {
     image.onload = function () {
-      const badgeSize = QR_SIZE * 0.20;
-      const cx = QR_SIZE / 2, cy = QR_SIZE / 2;
+      const totalSize = QR_SIZE * DPR;
+      const badgeSize = totalSize * 0.20;
+      const cx = totalSize / 2, cy = totalSize / 2;
       qrCtx.save();
       qrCtx.fillStyle = "#FFFFFF";
-      roundedRect(qrCtx, cx - badgeSize / 2 - 6, cy - badgeSize / 2 - 6, badgeSize + 12, badgeSize + 12, 14);
+      roundedRect(qrCtx, cx - badgeSize / 2 - 6 * DPR, cy - badgeSize / 2 - 6 * DPR, badgeSize + 12 * DPR, badgeSize + 12 * DPR, 14 * DPR);
       qrCtx.fill();
       qrCtx.drawImage(image, cx - badgeSize / 2, cy - badgeSize / 2, badgeSize, badgeSize);
       qrCtx.restore();
@@ -596,8 +613,11 @@ async function render() {
 
   const rounded = isRounded();
 
-  canvas.width = layout.width;
-  canvas.height = layout.height;
+  canvas.width = Math.round(layout.width * DPR);
+  canvas.height = Math.round(layout.height * DPR);
+  canvas.style.width = layout.width + "px";
+  canvas.style.height = layout.height + "px";
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
   const frameColor = isValidHex(document.getElementById("frame-color").value)
     ? document.getElementById("frame-color").value.toUpperCase() : "#6D5DFC";
@@ -605,28 +625,28 @@ async function render() {
 
   if (currentFrame === "none") {
     ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, layout.width, layout.height);
     ctx.drawImage(qrCanvas, 0, 0, QR_SIZE, QR_SIZE);
-    document.getElementById("preview-info").textContent = "PNG • 500 × 500 px • margem branca de 15 px";
+    document.getElementById("preview-info").textContent = `PNG • ${canvas.width} × ${canvas.height} px • margem branca de 15 px`;
     return;
   }
 
   if (currentFrame === "full") {
     ctx.fillStyle = frameColor;
     if (rounded) {
-      roundedRect(ctx, 0, 0, canvas.width, canvas.height, 26);
+      roundedRect(ctx, 0, 0, layout.width, layout.height, 26);
       ctx.fill();
     } else {
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, layout.width, layout.height);
     }
     ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, QR_SIZE, QR_SIZE);
     ctx.fillStyle = "#FFFFFF";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
-    const centerX = canvas.width / 2;
-    const centerY = layout.qrY + QR_SIZE + BOTTOM_TEXT_H / 2;
-    const fontSize = fitText(ctx, frameText, canvas.width - 50, 21);
-    ctx.font = `700 ${fontSize}px Arial`;
+    const centerX = layout.width / 2;
+    const centerY = layout.qrY + QR_SIZE + layout.bottomH / 2;
+    const fontSize = fitText(ctx, frameText, layout.width - 50, Math.round(frameThickness * 0.42));
+    ctx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
     ctx.fillText(frameText, centerX, centerY);
     document.getElementById("preview-info").textContent =
       `PNG • ${canvas.width} × ${canvas.height} px • borda completa`;
@@ -634,7 +654,7 @@ async function render() {
   }
 
   ctx.fillStyle = backgroundColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, layout.width, layout.height);
   ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, QR_SIZE, QR_SIZE);
 
   const bar = layout.bar;
@@ -654,27 +674,18 @@ async function render() {
     ctx.save();
     ctx.translate(bar.x + bar.w / 2, bar.y + bar.h / 2);
     ctx.rotate((Math.PI / 2) * layout.rotate);
-    const fontSize = fitText(ctx, frameText, bar.h - 40, 20);
-    ctx.font = `700 ${fontSize}px Arial`;
+    const fontSize = fitText(ctx, frameText, bar.h - 40, Math.round(bar.w * 0.42));
+    ctx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
     ctx.fillText(frameText, 0, 0);
     ctx.restore();
   } else {
-    const fontSize = fitText(ctx, frameText, bar.w - 40, 21);
-    ctx.font = `700 ${fontSize}px Arial`;
+    const fontSize = fitText(ctx, frameText, bar.w - 40, Math.round(bar.h * 0.42));
+    ctx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
     ctx.fillText(frameText, bar.x + bar.w / 2, bar.y + bar.h / 2);
   }
 
   document.getElementById("preview-info").textContent =
-    `PNG • ${canvas.width} × ${canvas.height} px • QR 500 × 500`;
-}
-
-function generate() {
-  if (!input.value.trim()) {
-    input.focus();
-    return;
-  }
-  updatePreview();
-  preview.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    `PNG • ${canvas.width} × ${canvas.height} px • QR ${QR_SIZE * DPR} × ${QR_SIZE * DPR}`;
 }
 
 function downloadQRCode() {
@@ -713,7 +724,6 @@ input.addEventListener("blur", function () {
   updatePreview();
 });
 
-document.getElementById("generate-button").addEventListener("click", generate);
 downloadButton.addEventListener("click", downloadQRCode);
 
 document.getElementById("clear-button").addEventListener("click", function () {
@@ -767,9 +777,17 @@ document.querySelectorAll(".frame-button").forEach(button => {
     document.querySelectorAll(".frame-button").forEach(item => item.classList.remove("active"));
     this.classList.add("active");
     currentFrame = this.dataset.frame;
-    document.getElementById("frame-options").style.display = currentFrame === "none" ? "none" : "block";
+    const hasFrame = currentFrame !== "none";
+    document.getElementById("frame-options").style.display = hasFrame ? "block" : "none";
+    document.getElementById("thickness-field").classList.toggle("visible", hasFrame);
     schedulePreview();
   });
+});
+
+document.getElementById("frame-thickness").addEventListener("input", function () {
+  frameThickness = parseInt(this.value, 10);
+  document.getElementById("thickness-value").textContent = frameThickness;
+  schedulePreview();
 });
 
 document.getElementById("icon-enabled").addEventListener("change", function () {
