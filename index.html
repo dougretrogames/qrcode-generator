@@ -1,386 +1,186 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#6D5DFC">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="theme-color" content="#6D5DFC">
+<title>Gerador de QR Code</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+:root {
+  --primary: #6D5DFC;
+  --primary-dark: #5748e8;
+  --background: #f4f5fb;
+  --card: #ffffff;
+  --text: #171827;
+  --muted: #777b8c;
+  --border: #e3e5ed;
+  --radius-lg: 20px;
+}
 
-  <title>Gerador de QR Code</title>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #12131c;
+    --card: #1b1c29;
+    --text: #f2f2f7;
+    --muted: #9498a8;
+    --border: #2c2e40;
+  }
+  input, select, textarea, .frame-button, .social-button {
+    background: #22233350 !important;
+    color: var(--text);
+  }
+}
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
 
-  <style>
-    :root {
-      --primary: #6D5DFC;
-      --primary-dark: #5748e8;
-      --background: #f4f5fb;
-      --card: #ffffff;
-      --text: #171827;
-      --muted: #777b8c;
-      --border: #e3e5ed;
-    }
+body {
+  min-height: 100vh;
+  padding: max(20px, env(safe-area-inset-top)) 14px max(20px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 10% 0%, #6d5dfc22, transparent 32%),
+    radial-gradient(circle at 100% 100%, #6d5dfc18, transparent 30%),
+    var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  transition: background .3s, color .3s;
+}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+.app {
+  width: min(100%, 700px);
+  margin: auto;
+  padding: 28px;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 55px rgba(28, 30, 52, 0.10);
+}
 
-    body {
-      min-height: 100vh;
-      padding: 20px 14px;
-      background:
-        radial-gradient(circle at 10% 0%, #6d5dfc22, transparent 32%),
-        radial-gradient(circle at 100% 100%, #6d5dfc18, transparent 30%),
-        var(--background);
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-      color: var(--text);
-    }
+.header { text-align: center; margin-bottom: 25px; }
 
-    .app {
-      width: min(100%, 700px);
-      margin: auto;
-      padding: 28px;
-      background: var(--card);
-      border-radius: 24px;
-      box-shadow: 0 18px 55px rgba(28, 30, 52, 0.10);
-    }
+.logo {
+  width: 54px; height: 54px; margin: 0 auto 14px;
+  display: grid; place-items: center; border-radius: 16px;
+  background: linear-gradient(135deg, #6D5DFC, #897DFF);
+  box-shadow: 0 10px 25px #6D5DFC40;
+}
+.logo::before { content: ""; width: 22px; height: 22px; border: 4px solid white; border-radius: 4px; }
 
-    .header {
-      text-align: center;
-      margin-bottom: 25px;
-    }
+h1 { font-size: clamp(1.4rem, 5vw, 1.7rem); letter-spacing: -0.03em; }
+.subtitle { margin-top: 7px; color: var(--muted); font-size: 0.94rem; }
 
-    .logo {
-      width: 54px;
-      height: 54px;
-      margin: 0 auto 14px;
-      display: grid;
-      place-items: center;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #6D5DFC, #897DFF);
-      box-shadow: 0 10px 25px #6D5DFC40;
-    }
+.label { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.88rem; font-weight: 700; }
+.counter { color: var(--muted); font-weight: 500; }
 
-    .logo::before {
-      content: "";
-      width: 22px;
-      height: 22px;
-      border: 4px solid white;
-      border-radius: 4px;
-    }
+.input-wrapper { position: relative; }
 
-    h1 {
-      font-size: 1.7rem;
-      letter-spacing: -0.03em;
-    }
+textarea {
+  display: block; width: 100%; min-height: 105px; resize: vertical;
+  padding: 14px 45px 14px 15px; border: 1px solid var(--border); border-radius: 13px;
+  background: #fafbfe; color: var(--text); font: inherit; font-size: 16px; line-height: 1.45; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
 
-    .subtitle {
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 0.94rem;
-    }
+textarea:focus, input:focus, select:focus {
+  border-color: var(--primary); box-shadow: 0 0 0 4px #6D5DFC18; background: white;
+}
+@media (prefers-color-scheme: dark) {
+  textarea:focus, input:focus, select:focus { background: #22233370; }
+}
 
-    .label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 7px;
-      font-size: 0.88rem;
-      font-weight: 700;
-    }
+.clear-button {
+  position: absolute; top: 9px; right: 9px; width: 34px; height: 34px;
+  border: none; border-radius: 8px; background: transparent; color: #9296a5;
+  cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.clear-button:hover, .clear-button:active { background: #00000010; }
 
-    .counter {
-      color: var(--muted);
-      font-weight: 500;
-    }
+.customization { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--border); }
+.section-title { margin-bottom: 14px; font-weight: 800; }
 
-    .input-wrapper {
-      position: relative;
-    }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.field { margin-bottom: 14px; }
+.field-label { display: block; margin-bottom: 7px; font-size: 0.81rem; font-weight: 700; }
 
-    textarea {
-      display: block;
-      width: 100%;
-      min-height: 105px;
-      resize: vertical;
-      padding: 14px 45px 14px 15px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: #fafbfe;
-      color: var(--text);
-      font: inherit;
-      font-size: 1rem;
-      line-height: 1.45;
-      outline: none;
-    }
+input, select {
+  width: 100%; height: 44px; padding: 0 11px; border: 1px solid var(--border);
+  border-radius: 10px; background: #fafbfe; color: var(--text); font: inherit; font-size: 16px; outline: none;
+}
 
-    textarea:focus,
-    input:focus,
-    select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px #6D5DFC18;
-      background: white;
-    }
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatch {
+  width: 36px; height: 36px; border: 2px solid white; outline: 1px solid #d9dbe4;
+  border-radius: 50%; cursor: pointer; transition: transform .15s;
+}
+.swatch:active { transform: scale(0.9); }
+.swatch.active { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-    .clear-button {
-      position: absolute;
-      top: 9px;
-      right: 9px;
-      width: 30px;
-      height: 30px;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      color: #9296a5;
-      cursor: pointer;
-      font-size: 21px;
-    }
+.hex-row { display: flex; gap: 8px; }
+.color-picker { width: 48px; height: 44px; padding: 3px; border: 1px solid var(--border); border-radius: 10px; background: white; cursor: pointer; }
+.hex-input { flex: 1; text-transform: uppercase; }
 
-    .customization {
-      margin-top: 22px;
-      padding-top: 22px;
-      border-top: 1px solid var(--border);
-    }
+.frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
+.frame-button {
+  min-height: 52px; border: 1px solid var(--border); border-radius: 10px; background: #fafbfe;
+  color: var(--muted); font: inherit; font-size: 0.76rem; font-weight: 650; cursor: pointer;
+  transition: transform .1s, border-color .15s;
+}
+.frame-button:active { transform: scale(0.96); }
+.frame-button.active { border-color: var(--primary); color: var(--primary); background: #6D5DFC0D; box-shadow: inset 0 0 0 1px var(--primary); }
 
-    .section-title {
-      margin-bottom: 14px;
-      font-weight: 800;
-    }
+.checkbox-field label { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 0.86rem; font-weight: 650; }
+.checkbox-field input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--primary); cursor: pointer; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 13px;
-    }
+.social-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.social-button {
+  min-height: 58px; border: 1px solid var(--border); border-radius: 10px; background: #fafbfe;
+  color: var(--muted); font: inherit; font-size: 0.72rem; cursor: pointer; transition: transform .1s, border-color .15s;
+}
+.social-button:active { transform: scale(0.96); }
+.social-button.active { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.social-button svg { display: block; width: 20px; height: 20px; margin: 0 auto 4px; }
 
-    .field {
-      margin-bottom: 14px;
-    }
+.frame-options { display: none; margin-top: 5px; }
 
-    .field-label {
-      display: block;
-      margin-bottom: 7px;
-      font-size: 0.81rem;
-      font-weight: 700;
-    }
+.actions { display: flex; gap: 10px; margin-top: 18px; position: sticky; bottom: max(10px, env(safe-area-inset-bottom)); }
+.action-button {
+  flex: 1; min-height: 50px; border: none; border-radius: 12px; font: inherit; font-weight: 750; cursor: pointer;
+  transition: transform .12s, opacity .2s; -webkit-tap-highlight-color: transparent;
+}
+.action-button:active { transform: scale(0.97); }
 
-    input,
-    select {
-      width: 100%;
-      height: 43px;
-      padding: 0 11px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #fafbfe;
-      color: var(--text);
-      font: inherit;
-      outline: none;
-    }
+.generate-button { color: white; background: linear-gradient(135deg, #6D5DFC, #7B6CFF); box-shadow: 0 8px 18px #6D5DFC38; }
+.download-button { display: none; color: white; background: #171827; }
 
-    .swatches {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-    }
+.preview { display: none; margin-top: 23px; padding-top: 23px; border-top: 1px solid var(--border); text-align: center; }
+.preview.visible { display: block; animation: fadeIn .35s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .swatch {
-      width: 34px;
-      height: 34px;
-      border: 2px solid white;
-      outline: 1px solid #d9dbe4;
-      border-radius: 50%;
-      cursor: pointer;
-    }
+.preview-container { overflow: auto; padding: 5px; }
+#qr-canvas { display: block; width: auto; max-width: 100%; height: auto; margin: auto; border-radius: 8px; box-shadow: 0 10px 28px rgba(28, 30, 52, 0.12); }
+.preview-info { margin-top: 11px; color: var(--muted); font-size: 0.8rem; }
 
-    .swatch.active {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-    }
+.footer { margin-top: 20px; text-align: center; color: #9a9daa; font-size: 0.75rem; }
 
-    .hex-row {
-      display: flex;
-      gap: 8px;
-    }
+@media (max-width: 600px) {
+  .app { padding: 20px 16px; border-radius: 18px; }
+  .grid { grid-template-columns: 1fr; }
+  .social-grid { grid-template-columns: repeat(2, 1fr); }
+  .actions { flex-direction: column; position: static; }
+}
 
-    .color-picker {
-      width: 48px;
-      height: 43px;
-      padding: 3px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: white;
-      cursor: pointer;
-    }
-
-    .hex-input {
-      flex: 1;
-      text-transform: uppercase;
-    }
-
-    .frames {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .frame-button {
-      min-height: 60px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #fafbfe;
-      color: var(--muted);
-      font: inherit;
-      font-size: 0.74rem;
-      font-weight: 650;
-      cursor: pointer;
-    }
-
-    .frame-button.active {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: #6D5DFC0D;
-      box-shadow: inset 0 0 0 1px var(--primary);
-    }
-
-    .social-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .social-button {
-      min-height: 52px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #fafbfe;
-      color: var(--muted);
-      font: inherit;
-      font-size: 0.72rem;
-      cursor: pointer;
-    }
-
-    .social-button.active {
-      border-color: var(--primary);
-      color: var(--primary);
-      box-shadow: inset 0 0 0 1px var(--primary);
-    }
-
-    .social-button svg {
-      display: block;
-      width: 19px;
-      height: 19px;
-      margin: 0 auto 3px;
-      fill: currentColor;
-    }
-
-    .frame-options {
-      display: none;
-      margin-top: 5px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .action-button {
-      flex: 1;
-      min-height: 47px;
-      border: none;
-      border-radius: 12px;
-      font: inherit;
-      font-weight: 750;
-      cursor: pointer;
-    }
-
-    .generate-button {
-      color: white;
-      background: linear-gradient(135deg, #6D5DFC, #7B6CFF);
-      box-shadow: 0 8px 18px #6D5DFC38;
-    }
-
-    .download-button {
-      display: none;
-      color: white;
-      background: #171827;
-    }
-
-    .preview {
-      display: none;
-      margin-top: 23px;
-      padding-top: 23px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-
-    .preview.visible {
-      display: block;
-    }
-
-    .preview-container {
-      overflow: auto;
-      padding: 5px;
-    }
-
-    #qr-canvas {
-      display: block;
-      width: auto;
-      max-width: 100%;
-      height: auto;
-      margin: auto;
-      box-shadow: 0 10px 28px rgba(28, 30, 52, 0.12);
-    }
-
-    .preview-info {
-      margin-top: 11px;
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-
-    .footer {
-      margin-top: 20px;
-      text-align: center;
-      color: #9a9daa;
-      font-size: 0.75rem;
-    }
-
-    @media (max-width: 600px) {
-      .app {
-        padding: 21px 17px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .frames {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .actions {
-        flex-direction: column;
-      }
-    }
-  </style>
+@media (min-width: 900px) {
+  body { display: flex; align-items: center; }
+}
+</style>
 </head>
-
 <body>
-
 <main class="app">
-
   <header class="header">
     <div class="logo"></div>
     <h1>Gerador de QR Code</h1>
-    <p class="subtitle">
-      Crie, personalize e baixe seu QR Code em PNG.
-    </p>
+    <p class="subtitle">Crie, personalize e baixe seu QR Code em PNG — com pré-visualização em tempo real.</p>
   </header>
 
   <div class="label">
@@ -389,1723 +189,560 @@
   </div>
 
   <div class="input-wrapper">
-    <textarea
-      id="qr-text"
-      maxlength="2000"
-      placeholder="Cole um link ou digite qualquer texto..."
-      spellcheck="false"
-    ></textarea>
-
-    <button
-      id="clear-button"
-      class="clear-button"
-      type="button"
-      aria-label="Limpar"
-    >×</button>
+    <textarea id="qr-text" maxlength="2000" placeholder="Cole um link ou digite qualquer texto..." spellcheck="false"></textarea>
+    <button id="clear-button" class="clear-button" type="button" aria-label="Limpar">×</button>
   </div>
 
-
   <section class="customization">
-
-    <div class="section-title">
-      Personalização
-    </div>
-
+    <div class="section-title">Personalização</div>
 
     <div class="grid">
-
       <div class="field">
-        <label class="field-label">
-          Formato dos pixels
-        </label>
-
-        <select id="module-style">
+        <label class="field-label">Formato dos pixels</label>
+        <select id="module-style" aria-label="Formato dos pixels">
           <option value="square">Quadrado</option>
           <option value="rounded">Arredondado</option>
           <option value="dot">Pontos</option>
           <option value="soft">Arredondado suave</option>
         </select>
       </div>
-
-
       <div class="field">
-        <label class="field-label">
-          Correção de erro
-        </label>
-
-        <select id="error-level">
+        <label class="field-label">Correção de erro</label>
+        <select id="error-level" aria-label="Correção de erro">
           <option value="H">Alta — H</option>
           <option value="Q">Boa — Q</option>
           <option value="M">Média — M</option>
           <option value="L">Baixa — L</option>
         </select>
       </div>
-
     </div>
-
 
     <div class="field">
-
-      <label class="field-label">
-        Cores predefinidas
-      </label>
-
-      <div class="swatches">
-
-        <button class="swatch active"
-          data-color="#000000"
-          style="background:#000000"></button>
-
-        <button class="swatch"
-          data-color="#1F2937"
-          style="background:#1F2937"></button>
-
-        <button class="swatch"
-          data-color="#2563EB"
-          style="background:#2563EB"></button>
-
-        <button class="swatch"
-          data-color="#6D5DFC"
-          style="background:#6D5DFC"></button>
-
-        <button class="swatch"
-          data-color="#7C3AED"
-          style="background:#7C3AED"></button>
-
-        <button class="swatch"
-          data-color="#DB2777"
-          style="background:#DB2777"></button>
-
-        <button class="swatch"
-          data-color="#DC2626"
-          style="background:#DC2626"></button>
-
-        <button class="swatch"
-          data-color="#EA580C"
-          style="background:#EA580C"></button>
-
-        <button class="swatch"
-          data-color="#16A34A"
-          style="background:#16A34A"></button>
-
-        <button class="swatch"
-          data-color="#0891B2"
-          style="background:#0891B2"></button>
-
+      <label class="field-label">Cores predefinidas</label>
+      <div class="swatches" role="group" aria-label="Cores predefinidas">
+        <button class="swatch active" data-color="#000000" style="background:#000000" aria-label="Preto"></button>
+        <button class="swatch" data-color="#1F2937" style="background:#1F2937" aria-label="Cinza escuro"></button>
+        <button class="swatch" data-color="#2563EB" style="background:#2563EB" aria-label="Azul"></button>
+        <button class="swatch" data-color="#6D5DFC" style="background:#6D5DFC" aria-label="Roxo"></button>
+        <button class="swatch" data-color="#7C3AED" style="background:#7C3AED" aria-label="Violeta"></button>
+        <button class="swatch" data-color="#DB2777" style="background:#DB2777" aria-label="Rosa"></button>
+        <button class="swatch" data-color="#DC2626" style="background:#DC2626" aria-label="Vermelho"></button>
+        <button class="swatch" data-color="#EA580C" style="background:#EA580C" aria-label="Laranja"></button>
+        <button class="swatch" data-color="#16A34A" style="background:#16A34A" aria-label="Verde"></button>
+        <button class="swatch" data-color="#0891B2" style="background:#0891B2" aria-label="Ciano"></button>
       </div>
-
     </div>
-
 
     <div class="grid">
-
       <div class="field">
-
-        <label class="field-label">
-          Cor do QR — HEX
-        </label>
-
+        <label class="field-label">Cor do QR — HEX</label>
         <div class="hex-row">
-
-          <input
-            id="qr-color-picker"
-            class="color-picker"
-            type="color"
-            value="#000000"
-          >
-
-          <input
-            id="qr-color"
-            class="hex-input"
-            type="text"
-            value="#000000"
-            maxlength="7"
-          >
-
+          <input id="qr-color-picker" class="color-picker" type="color" value="#000000" aria-label="Seletor de cor do QR">
+          <input id="qr-color" class="hex-input" type="text" value="#000000" maxlength="7" inputmode="text">
         </div>
-
       </div>
-
-
       <div class="field">
-
-        <label class="field-label">
-          Cor do fundo — HEX
-        </label>
-
+        <label class="field-label">Cor do fundo — HEX</label>
         <div class="hex-row">
-
-          <input
-            id="bg-color-picker"
-            class="color-picker"
-            type="color"
-            value="#FFFFFF"
-          >
-
-          <input
-            id="bg-color"
-            class="hex-input"
-            type="text"
-            value="#FFFFFF"
-            maxlength="7"
-          >
-
+          <input id="bg-color-picker" class="color-picker" type="color" value="#FFFFFF" aria-label="Seletor de cor do fundo">
+          <input id="bg-color" class="hex-input" type="text" value="#FFFFFF" maxlength="7" inputmode="text">
         </div>
-
       </div>
-
     </div>
-
 
     <div class="field">
-
-      <label class="field-label">
-        Frame
-      </label>
-
+      <label class="field-label">Posição do frame</label>
       <div class="frames">
-
-        <button
-          class="frame-button active"
-          data-frame="none"
-        >
-          Sem frame<br>
-          500×500
-        </button>
-
-        <button
-          class="frame-button"
-          data-frame="thin"
-        >
-          Frame fino<br>
-          530×565
-        </button>
-
-        <button
-          class="frame-button"
-          data-frame="classic"
-        >
-          Clássico<br>
-          540×575
-        </button>
-
-        <button
-          class="frame-button"
-          data-frame="rounded"
-        >
-          Arredondado<br>
-          540×585
-        </button>
-
-        <button
-          class="frame-button"
-          data-frame="social"
-        >
-          Social<br>
-          540×595
-        </button>
-
+        <button class="frame-button active" data-frame="none">Nenhum</button>
+        <button class="frame-button" data-frame="top">Superior</button>
+        <button class="frame-button" data-frame="bottom">Inferior</button>
+        <button class="frame-button" data-frame="left">Lateral esq.</button>
+        <button class="frame-button" data-frame="right">Lateral dir.</button>
+        <button class="frame-button" data-frame="full">Completo</button>
+        <button class="frame-button" data-frame="social">Social</button>
       </div>
-
     </div>
 
-
-    <div
-      id="frame-options"
-      class="frame-options"
-    >
-
+    <div id="frame-options" class="frame-options">
       <div class="grid">
-
         <div class="field">
-
-          <label class="field-label">
-            Texto do frame
-          </label>
-
-          <input
-            id="frame-text"
-            type="text"
-            value="Acesse aqui"
-            maxlength="70"
-          >
-
+          <label class="field-label">Texto do frame</label>
+          <input id="frame-text" type="text" value="Acesse aqui" maxlength="70">
         </div>
-
-
         <div class="field">
-
-          <label class="field-label">
-            Cor do frame
-          </label>
-
+          <label class="field-label">Cor do frame</label>
           <div class="hex-row">
-
-            <input
-              id="frame-color-picker"
-              class="color-picker"
-              type="color"
-              value="#6D5DFC"
-            >
-
-            <input
-              id="frame-color"
-              class="hex-input"
-              type="text"
-              value="#6D5DFC"
-              maxlength="7"
-            >
-
+            <input id="frame-color-picker" class="color-picker" type="color" value="#6D5DFC" aria-label="Seletor de cor do frame">
+            <input id="frame-color" class="hex-input" type="text" value="#6D5DFC" maxlength="7">
           </div>
-
         </div>
-
       </div>
 
+      <div class="field checkbox-field">
+        <label>
+          <input type="checkbox" id="frame-rounded">
+          Cantos arredondados
+        </label>
+      </div>
 
-      <div
-        id="social-options"
-        style="display:none"
-      >
-
+      <div id="social-options" style="display:none">
         <div class="field">
-
-          <label class="field-label">
-            Ícone da rede social
-          </label>
-
+          <label class="field-label">Ícone da rede social</label>
           <div class="social-grid">
-
-
-            <!-- YOUTUBE -->
-
-            <button
-              class="social-button active"
-              data-social="youtube"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.9V8.1l6.5 3.9-6.5 3.9z"/>
-              </svg>
-
+            <button class="social-button active" data-social="youtube">
+              <svg viewBox="0 0 24 24"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/><path fill="#FFFFFF" d="M9.6 15.9V8.1l6.5 3.9-6.5 3.9z"/></svg>
               YouTube
-
             </button>
-
-
-            <!-- WHATSAPP -->
-
-            <button
-              class="social-button"
-              data-social="whatsapp"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M20.5 3.5A11.9 11.9 0 0 0 12.1 0C5.5 0 .2 5.3.2 11.9c0 2.1.5 4.1 1.6 5.9L.1 24l6.3-1.7a11.8 11.8 0 0 0 5.7 1.5h.1c6.5 0 11.8-5.3 11.8-11.9 0-3.2-1.3-6.2-3.5-8.4z"/>
-              </svg>
-
+            <button class="social-button" data-social="whatsapp">
+              <svg viewBox="0 0 24 24"><path fill="#25D366" d="M20.5 3.5A11.9 11.9 0 0 0 12.1 0C5.5 0 .2 5.3.2 11.9c0 2.1.5 4.1 1.6 5.9L.1 24l6.3-1.7a11.8 11.8 0 0 0 5.7 1.5h.1c6.5 0 11.8-5.3 11.8-11.9 0-3.2-1.3-6.2-3.5-8.4z"/><path fill="#FFFFFF" d="M9.1 6.9c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.1s.9 2.4 1 2.6c.1.1 1.5 2.5 3.9 3.5 2 .8 2.4.7 2.8.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3l-1.6-.8c-.2-.1-.4-.1-.6.1l-.6.8c-.1.1-.3.2-.5.1-.4-.2-1.5-.7-2.2-1.9-.1-.2-.1-.4.1-.5l.5-.7c.1-.2.1-.4 0-.6z"/></svg>
               WhatsApp
-
             </button>
-
-
-            <!-- INSTAGRAM -->
-
-            <button
-              class="social-button"
-              data-social="instagram"
-            >
-
+            <button class="social-button" data-social="instagram">
               <svg viewBox="0 0 24 24">
-                <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5z"/>
+                <defs>
+                  <linearGradient id="ig-grad-1" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#FEDA75"/>
+                    <stop offset="30%" stop-color="#FA7E1E"/>
+                    <stop offset="55%" stop-color="#D62976"/>
+                    <stop offset="80%" stop-color="#962FBF"/>
+                    <stop offset="100%" stop-color="#4F5BD5"/>
+                  </linearGradient>
+                </defs>
+                <path fill="url(#ig-grad-1)" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zM17.8 5.3a1 1 0 1 1-1 1 1 1 0 0 1 1-1z"/>
               </svg>
-
               Instagram
-
             </button>
-
-
-            <!-- TELEGRAM -->
-
-            <button
-              class="social-button"
-              data-social="telegram"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M22.2 2.2 1.3 10.3c-1.4.6-1.4 1.4-.3 1.7l5.4 1.7 2.1 6.5c.3.9.2 1.3 1.1 1.3.7 0 1-.3 1.4-.7l2.6-2.5 5.4 4c1 .6 1.7.3 1.9-.9l3.5-16.6c.3-1.5-.6-2.2-2.2-1.6z"/>
-              </svg>
-
+            <button class="social-button" data-social="telegram">
+              <svg viewBox="0 0 24 24"><path fill="#26A5E4" d="M22.2 2.2 1.3 10.3c-1.4.6-1.4 1.4-.3 1.7l5.4 1.7 2.1 6.5c.3.9.2 1.3 1.1 1.3.7 0 1-.3 1.4-.7l2.6-2.5 5.4 4c1 .6 1.7.3 1.9-.9l3.5-16.6c.3-1.5-.6-2.2-2.2-1.6z"/><path fill="#FFFFFF" d="m8.6 14.2 9.5-7c.4-.3.7 0 .4.3l-7.7 7.6-.3 3.2c-.4 0-.6-.2-.8-.5l-1.1-3.6z"/></svg>
               Telegram
-
             </button>
-
-
-            <!-- DISCORD -->
-
-            <button
-              class="social-button"
-              data-social="discord"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M20.3 4.4A16 16 0 0 0 16.4 3l-.5 1a14 14 0 0 0-7.8 0l-.5-1a16 16 0 0 0-3.9 1.4C1.2 8.5.5 12.5.8 16.5a16 16 0 0 0 4.8 2.4l1.2-1.7a10 10 0 0 1-1.9-.9l.5-.4a11.4 11.4 0 0 0 13.2 0l.5.4a10 10 0 0 1-1.9.9l1.2 1.7a16 16 0 0 0 4.8-2.4c.4-4.7-.8-8.7-2.9-12.1z"/>
-              </svg>
-
+            <button class="social-button" data-social="discord">
+              <svg viewBox="0 0 24 24"><path fill="#5865F2" d="M20.3 4.4A16 16 0 0 0 16.4 3l-.5 1a14 14 0 0 0-7.8 0l-.5-1a16 16 0 0 0-3.9 1.4C1.2 8.5.5 12.5.8 16.5a16 16 0 0 0 4.8 2.4l1.2-1.7a10 10 0 0 1-1.9-.9l.5-.4a11.4 11.4 0 0 0 13.2 0l.5.4a10 10 0 0 1-1.9.9l1.2 1.7a16 16 0 0 0 4.8-2.4c.4-4.7-.8-8.7-2.9-12.1zM8.7 14.3a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4zm6.6 0a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4z"/></svg>
               Discord
-
             </button>
-
-
-            <!-- X -->
-
-            <button
-              class="social-button"
-              data-social="x"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.4L2.8 2h6.5l4.4 5.8L18.9 2z"/>
-              </svg>
-
+            <button class="social-button" data-social="x">
+              <svg viewBox="0 0 24 24"><path fill="#000000" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.4L2.8 2h6.5l4.4 5.8L18.9 2z"/></svg>
               X
-
             </button>
-
-
-            <!-- TIKTOK -->
-
-            <button
-              class="social-button"
-              data-social="tiktok"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M16.5 2c.3 2.1 1.5 3.5 3.5 3.7v3.2a9 9 0 0 1-3.5-1v6.7a6.4 6.4 0 1 1-5.5-6.3v3.4a3.1 3.1 0 1 0 2.3 3V2h3.2z"/>
-              </svg>
-
+            <button class="social-button" data-social="tiktok">
+              <svg viewBox="0 0 24 24"><path fill="#000000" d="M16.5 2c.3 2.1 1.5 3.5 3.5 3.7v3.2a9 9 0 0 1-3.5-1v6.7a6.4 6.4 0 1 1-5.5-6.3v3.4a3.1 3.1 0 1 0 2.3 3V2h3.2z"/></svg>
               TikTok
-
             </button>
-
-
-            <!-- FACEBOOK -->
-
-            <button
-              class="social-button"
-              data-social="facebook"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M24 12A12 12 0 1 0 10.1 23.8v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.6-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.4h-2.9v8.4A12 12 0 0 0 24 12z"/>
-              </svg>
-
+            <button class="social-button" data-social="facebook">
+              <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12A12 12 0 1 0 10.1 23.8v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.6-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.4h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>
               Facebook
-
             </button>
-
-
-            <!-- LINKEDIN -->
-
-            <button
-              class="social-button"
-              data-social="linkedin"
-            >
-
-              <svg viewBox="0 0 24 24">
-                <path d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2zM8 19H5V9h3v10zM6.5 7.7A1.8 1.8 0 1 1 6.5 4a1.8 1.8 0 0 1 0 3.7zM19 19h-3v-5.2c0-1.2 0-2.8-1.7-2.8s-2 1.3-2 2.7V19h-3V9h2.9v1.4h.1c.4-.8 1.4-1.7 2.9-1.7 3.1 0 3.7 2 3.7 4.6V19z"/>
-              </svg>
-
+            <button class="social-button" data-social="linkedin">
+              <svg viewBox="0 0 24 24"><path fill="#0A66C2" d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2zM8 19H5V9h3v10zM6.5 7.7A1.8 1.8 0 1 1 6.5 4a1.8 1.8 0 0 1 0 3.7zM19 19h-3v-5.2c0-1.2 0-2.8-1.7-2.8s-2 1.3-2 2.7V19h-3V9h2.9v1.4h.1c.4-.8 1.4-1.7 2.9-1.7 3.1 0 3.7 2 3.7 4.6V19z"/></svg>
               LinkedIn
-
             </button>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
-
   </section>
-
 
   <div class="actions">
-
-    <button
-      id="generate-button"
-      class="action-button generate-button"
-    >
-      Gerar QR Code
-    </button>
-
-    <button
-      id="download-button"
-      class="action-button download-button"
-    >
-      Baixar PNG
-    </button>
-
+    <button id="generate-button" class="action-button generate-button">Gerar QR Code</button>
+    <button id="download-button" class="action-button download-button">Baixar PNG</button>
   </div>
 
-
-  <section
-    id="preview"
-    class="preview"
-  >
-
-    <div class="preview-container">
-      <canvas id="qr-canvas"></canvas>
-    </div>
-
-    <p
-      id="preview-info"
-      class="preview-info"
-    ></p>
-
+  <section id="preview" class="preview">
+    <div class="preview-container"><canvas id="qr-canvas"></canvas></div>
+    <p id="preview-info" class="preview-info"></p>
   </section>
 
-
-  <footer class="footer">
-    Tudo é processado localmente no navegador.
-  </footer>
-
+  <footer class="footer">Tudo é processado localmente no navegador.</footer>
 </main>
 
-
 <script>
+const QR_SIZE = 500;
+const QR_MARGIN = 15;
+const GAP = 10;
+const BAR_THICK = 56;
+const SOCIAL_THICK = 76;
+const RING_THICK = 20;
+const BOTTOM_TEXT_H = 70;
 
-  const QR_SIZE = 500;
-  const QR_MARGIN = 15;
+const input = document.getElementById("qr-text");
+const canvas = document.getElementById("qr-canvas");
+const ctx = canvas.getContext("2d");
+const preview = document.getElementById("preview");
+const downloadButton = document.getElementById("download-button");
 
-  const input = document.getElementById("qr-text");
-  const canvas = document.getElementById("qr-canvas");
-  const ctx = canvas.getContext("2d");
+let qrColor = "#000000";
+let backgroundColor = "#FFFFFF";
+let currentFrame = "none";
+let currentSocial = "youtube";
+let renderTimeout = null;
 
-  const preview = document.getElementById("preview");
-  const downloadButton = document.getElementById("download-button");
+const socialTexts = {
+  youtube: "Inscreva-se no YouTube",
+  whatsapp: "Fale conosco no WhatsApp",
+  instagram: "Siga-nos no Instagram",
+  telegram: "Entre no nosso Telegram",
+  discord: "Entre no nosso Discord",
+  x: "Siga-nos no X",
+  tiktok: "Siga-nos no TikTok",
+  facebook: "Siga-nos no Facebook",
+  linkedin: "Conecte-se no LinkedIn"
+};
 
-  let qrColor = "#000000";
-  let backgroundColor = "#FFFFFF";
+function isValidHex(value) { return /^#[0-9A-Fa-f]{6}$/.test(value); }
 
-  let currentFrame = "none";
-  let currentSocial = "youtube";
+function updateCounter() {
+  const length = input.value.length;
+  document.getElementById("counter").textContent = `${length} ${length === 1 ? "caractere" : "caracteres"}`;
+}
 
-
-  /*
-   * CONFIGURAÇÃO DOS FRAMES
-   *
-   * O QR continua sempre com 500x500.
-   * O frame é adicionado externamente.
-   */
-
-  const frames = {
-
-    none: {
-      width: 500,
-      height: 500,
-      qrX: 0,
-      qrY: 0,
-      bottom: 0
-    },
-
-    thin: {
-      width: 530,
-      height: 565,
-      qrX: 15,
-      qrY: 15,
-      bottom: 50
-    },
-
-    classic: {
-      width: 540,
-      height: 575,
-      qrX: 20,
-      qrY: 15,
-      bottom: 60
-    },
-
-    rounded: {
-      width: 540,
-      height: 585,
-      qrX: 20,
-      qrY: 15,
-      bottom: 70
-    },
-
-    social: {
-      width: 540,
-      height: 595,
-      qrX: 20,
-      qrY: 15,
-      bottom: 80
+function generateBaseQR() {
+  const text = input.value.trim();
+  const errorLevel = document.getElementById("error-level").value;
+  const style = document.getElementById("module-style").value;
+  const qr = qrcode(0, errorLevel);
+  qr.addData(text);
+  qr.make();
+  const modules = qr.getModuleCount();
+  const usableSize = QR_SIZE - (QR_MARGIN * 2);
+  const moduleSize = usableSize / modules;
+  const qrCanvas = document.createElement("canvas");
+  qrCanvas.width = QR_SIZE;
+  qrCanvas.height = QR_SIZE;
+  const qrCtx = qrCanvas.getContext("2d");
+  qrCtx.fillStyle = backgroundColor;
+  qrCtx.fillRect(0, 0, QR_SIZE, QR_SIZE);
+  qrCtx.fillStyle = qrColor;
+  for (let row = 0; row < modules; row++) {
+    for (let col = 0; col < modules; col++) {
+      if (!qr.isDark(row, col)) continue;
+      const x = QR_MARGIN + col * moduleSize;
+      const y = QR_MARGIN + row * moduleSize;
+      drawModule(qrCtx, x, y, moduleSize, style);
     }
-
-  };
-
-
-  const socialTexts = {
-
-    youtube: "Inscreva-se no YouTube",
-    whatsapp: "Fale conosco no WhatsApp",
-    instagram: "Siga-nos no Instagram",
-    telegram: "Entre no nosso Telegram",
-    discord: "Entre no nosso Discord",
-    x: "Siga-nos no X",
-    tiktok: "Siga-nos no TikTok",
-    facebook: "Siga-nos no Facebook",
-    linkedin: "Conecte-se no LinkedIn"
-
-  };
-
-
-  function isValidHex(value) {
-
-    return /^#[0-9A-Fa-f]{6}$/.test(value);
-
   }
+  return qrCanvas;
+}
 
-
-  function updateCounter() {
-
-    const length = input.value.length;
-
-    document.getElementById("counter").textContent =
-      `${length} ${length === 1 ? "caractere" : "caracteres"}`;
-
+function drawModule(context, x, y, size, style) {
+  if (style === "square") {
+    context.fillRect(Math.round(x), Math.round(y), Math.ceil(size), Math.ceil(size));
+    return;
   }
-
-
-  /*
-   * GERA O QR CODE
-   *
-   * O módulo é desenhado diretamente no Canvas.
-   * Isso permite utilizar formatos arredondados sem
-   * depender de imagens intermediárias.
-   */
-
-  function generateBaseQR() {
-
-    const text = input.value.trim();
-
-    const errorLevel =
-      document.getElementById("error-level").value;
-
-    const style =
-      document.getElementById("module-style").value;
-
-
-    const qr = qrcode(0, errorLevel);
-
-    qr.addData(text);
-    qr.make();
-
-
-    const modules = qr.getModuleCount();
-
-    const usableSize =
-      QR_SIZE - (QR_MARGIN * 2);
-
-    const moduleSize =
-      usableSize / modules;
-
-
-    const qrCanvas =
-      document.createElement("canvas");
-
-    qrCanvas.width = QR_SIZE;
-    qrCanvas.height = QR_SIZE;
-
-    const qrCtx =
-      qrCanvas.getContext("2d");
-
-
-    qrCtx.fillStyle = backgroundColor;
-
-    qrCtx.fillRect(
-      0,
-      0,
-      QR_SIZE,
-      QR_SIZE
-    );
-
-
-    qrCtx.fillStyle = qrColor;
-
-
-    for (let row = 0; row < modules; row++) {
-
-      for (let col = 0; col < modules; col++) {
-
-        if (!qr.isDark(row, col)) {
-          continue;
-        }
-
-
-        const x =
-          QR_MARGIN + col * moduleSize;
-
-        const y =
-          QR_MARGIN + row * moduleSize;
-
-
-        const size = moduleSize;
-
-
-        /*
-         * Os três padrões de localização permanecem
-         * quadrados para preservar a maior compatibilidade
-         * possível com leitores de QR Code.
-         */
-
-        const finder =
-          isFinderModule(row, col, modules);
-
-
-        if (finder) {
-
-          qrCtx.fillRect(
-            Math.round(x),
-            Math.round(y),
-            Math.ceil(size),
-            Math.ceil(size)
-          );
-
-        } else {
-
-          drawModule(
-            qrCtx,
-            x,
-            y,
-            size,
-            style
-          );
-
-        }
-
-      }
-
-    }
-
-
-    return qrCanvas;
-
-  }
-
-
-  function isFinderModule(row, col, size) {
-
-    return (
-
-      (
-        row < 7 &&
-        col < 7
-      )
-
-      ||
-
-      (
-        row < 7 &&
-        col >= size - 7
-      )
-
-      ||
-
-      (
-        row >= size - 7 &&
-        col < 7
-      )
-
-    );
-
-  }
-
-
-  function drawModule(
-    context,
-    x,
-    y,
-    size,
-    style
-  ) {
-
-    if (style === "square") {
-
-      context.fillRect(
-        Math.round(x),
-        Math.round(y),
-        Math.ceil(size),
-        Math.ceil(size)
-      );
-
-      return;
-
-    }
-
-
-    if (style === "dot") {
-
-      context.beginPath();
-
-      context.arc(
-        x + size / 2,
-        y + size / 2,
-        size * 0.43,
-        0,
-        Math.PI * 2
-      );
-
-      context.fill();
-
-      return;
-
-    }
-
-
-    let radius;
-
-    if (style === "soft") {
-
-      radius = size * 0.30;
-
-    } else {
-
-      radius = size * 0.43;
-
-    }
-
-
-    roundedRect(
-      context,
-      x + 0.15,
-      y + 0.15,
-      size - 0.3,
-      size - 0.3,
-      radius
-    );
-
-    context.fill();
-
-  }
-
-
-  function roundedRect(
-    context,
-    x,
-    y,
-    width,
-    height,
-    radius
-  ) {
-
-    radius =
-      Math.min(
-        radius,
-        width / 2,
-        height / 2
-      );
-
-
+  if (style === "dot") {
     context.beginPath();
-
-    context.moveTo(
-      x + radius,
-      y
-    );
-
-    context.lineTo(
-      x + width - radius,
-      y
-    );
-
-    context.quadraticCurveTo(
-      x + width,
-      y,
-      x + width,
-      y + radius
-    );
-
-    context.lineTo(
-      x + width,
-      y + height - radius
-    );
-
-    context.quadraticCurveTo(
-      x + width,
-      y + height,
-      x + width - radius,
-      y + height
-    );
-
-    context.lineTo(
-      x + radius,
-      y + height
-    );
-
-    context.quadraticCurveTo(
-      x,
-      y + height,
-      x,
-      y + height - radius
-    );
-
-    context.lineTo(
-      x,
-      y + radius
-    );
-
-    context.quadraticCurveTo(
-      x,
-      y,
-      x + radius,
-      y
-    );
-
-    context.closePath();
-
+    context.arc(x + size / 2, y + size / 2, size * 0.43, 0, Math.PI * 2);
+    context.fill();
+    return;
   }
+  let radius = style === "soft" ? size * 0.30 : size * 0.43;
+  roundedRect(context, x + 0.15, y + 0.15, size - 0.3, size - 0.3, radius);
+  context.fill();
+}
 
+function roundedRect(context, x, y, width, height, radius) {
+  radius = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.lineTo(x + width - radius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  context.lineTo(x + width, y + height - radius);
+  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  context.lineTo(x + radius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  context.lineTo(x, y + radius);
+  context.quadraticCurveTo(x, y, x + radius, y);
+  context.closePath();
+}
 
-  /*
-   * AJUSTA TEXTO DO FRAME
-   */
-
-  function fitText(
-    context,
-    text,
-    maxWidth,
-    initialSize
-  ) {
-
-    let size = initialSize;
-
-    context.font =
-      `700 ${size}px Arial`;
-
-    while (
-      context.measureText(text).width > maxWidth &&
-      size > 10
-    ) {
-
-      size--;
-
-      context.font =
-        `700 ${size}px Arial`;
-
-    }
-
-    return size;
-
+function fitText(context, text, maxWidth, initialSize) {
+  let size = initialSize;
+  context.font = `700 ${size}px Arial`;
+  while (context.measureText(text).width > maxWidth && size > 10) {
+    size--;
+    context.font = `700 ${size}px Arial`;
   }
+  return size;
+}
 
+function isRounded() { return document.getElementById("frame-rounded").checked; }
 
-  /*
-   * DESENHA O FRAME
-   */
+function computeLayout(position) {
+  switch (position) {
+    case "top":
+      return { width: QR_SIZE, height: QR_SIZE + GAP + BAR_THICK, qrX: 0, qrY: BAR_THICK + GAP,
+        bar: { x: 0, y: 0, w: QR_SIZE, h: BAR_THICK }, orientation: "h" };
+    case "bottom":
+      return { width: QR_SIZE, height: QR_SIZE + GAP + BAR_THICK, qrX: 0, qrY: 0,
+        bar: { x: 0, y: QR_SIZE + GAP, w: QR_SIZE, h: BAR_THICK }, orientation: "h" };
+    case "left":
+      return { width: QR_SIZE + GAP + BAR_THICK, height: QR_SIZE, qrX: BAR_THICK + GAP, qrY: 0,
+        bar: { x: 0, y: 0, w: BAR_THICK, h: QR_SIZE }, orientation: "v", rotate: -1 };
+    case "right":
+      return { width: QR_SIZE + GAP + BAR_THICK, height: QR_SIZE, qrX: 0, qrY: 0,
+        bar: { x: QR_SIZE + GAP, y: 0, w: BAR_THICK, h: QR_SIZE }, orientation: "v", rotate: 1 };
+    case "full":
+      return { width: QR_SIZE + RING_THICK * 2, height: RING_THICK + QR_SIZE + BOTTOM_TEXT_H,
+        qrX: RING_THICK, qrY: RING_THICK, full: true };
+    case "social":
+      return { width: QR_SIZE, height: QR_SIZE + GAP + SOCIAL_THICK, qrX: 0, qrY: 0,
+        bar: { x: 0, y: QR_SIZE + GAP, w: QR_SIZE, h: SOCIAL_THICK }, orientation: "h" };
+    default:
+      return { width: QR_SIZE, height: QR_SIZE, qrX: 0, qrY: 0 };
+  }
+}
 
-  function render() {
+function render() {
+  const text = input.value.trim();
+  if (!text) return;
 
-    const text = input.value.trim();
+  const layout = computeLayout(currentFrame);
+  const qrCanvas = generateBaseQR();
+  const rounded = isRounded();
 
-    if (!text) {
-      return;
-    }
+  canvas.width = layout.width;
+  canvas.height = layout.height;
 
+  const frameColor = isValidHex(document.getElementById("frame-color").value)
+    ? document.getElementById("frame-color").value.toUpperCase() : "#6D5DFC";
+  const frameText = document.getElementById("frame-text").value.trim() || "Acesse aqui";
 
-    const frame = frames[currentFrame];
-
-    const qrCanvas = generateBaseQR();
-
-
-    canvas.width = frame.width;
-    canvas.height = frame.height;
-
-
-    /*
-     * Fundo geral
-     */
-
+  if (currentFrame === "none") {
     ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(qrCanvas, 0, 0, QR_SIZE, QR_SIZE);
+    document.getElementById("preview-info").textContent = "PNG • 500 × 500 px • margem branca de 15 px";
+    return;
+  }
 
-    ctx.fillRect(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-
-    /*
-     * QR CENTRALIZADO
-     */
-
-    const qrX = frame.qrX;
-    const qrY = frame.qrY;
-
-
-    ctx.drawImage(
-      qrCanvas,
-      qrX,
-      qrY,
-      QR_SIZE,
-      QR_SIZE
-    );
-
-
-    /*
-     * SEM FRAME
-     */
-
-    if (currentFrame === "none") {
-
-      document.getElementById("preview-info").textContent =
-        "PNG • 500 × 500 px • margem branca de 15 px";
-
-      return;
-
-    }
-
-
-    const frameColor =
-      isValidHex(
-        document.getElementById("frame-color").value
-      )
-        ? document.getElementById("frame-color").value.toUpperCase()
-        : "#6D5DFC";
-
-
-    const frameTop =
-      qrY + QR_SIZE;
-
-
-    const frameHeight =
-      frame.height - frameTop;
-
-
-    /*
-     * FRAME
-     */
-
+  if (currentFrame === "full") {
     ctx.fillStyle = frameColor;
-
-
-    if (currentFrame === "rounded") {
-
-      roundedRect(
-        ctx,
-        0,
-        frameTop,
-        frame.width,
-        frameHeight,
-        22
-      );
-
+    if (rounded) {
+      roundedRect(ctx, 0, 0, canvas.width, canvas.height, 26);
       ctx.fill();
-
     } else {
-
-      ctx.fillRect(
-        0,
-        frameTop,
-        frame.width,
-        frameHeight
-      );
-
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-
-
-    /*
-     * TEXTO
-     */
-
-    const frameText =
-      document.getElementById("frame-text").value.trim()
-      || "Acesse aqui";
-
-
+    ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, QR_SIZE, QR_SIZE);
     ctx.fillStyle = "#FFFFFF";
-
     ctx.textBaseline = "middle";
-
     ctx.textAlign = "center";
-
-
-    const centerX =
-      canvas.width / 2;
-
-    const centerY =
-      frameTop + frameHeight / 2;
-
-
-    /*
-     * FRAME SOCIAL
-     */
-
-    if (currentFrame === "social") {
-
-      drawSocialFrame(
-        frameText,
-        frameColor,
-        centerX,
-        centerY
-      );
-
-    } else {
-
-      const fontSize =
-        fitText(
-          ctx,
-          frameText,
-          frame.width - 50,
-          21
-        );
-
-
-      ctx.font =
-        `700 ${fontSize}px Arial`;
-
-
-      ctx.fillText(
-        frameText,
-        centerX,
-        centerY
-      );
-
-    }
-
-
+    const centerX = canvas.width / 2;
+    const centerY = layout.qrY + QR_SIZE + BOTTOM_TEXT_H / 2;
+    const fontSize = fitText(ctx, frameText, canvas.width - 50, 21);
+    ctx.font = `700 ${fontSize}px Arial`;
+    ctx.fillText(frameText, centerX, centerY);
     document.getElementById("preview-info").textContent =
-      `PNG • ${frame.width} × ${frame.height} px • QR 500 × 500 • margem branca de 15 px`;
-
+      `PNG • ${canvas.width} × ${canvas.height} px • borda completa`;
+    return;
   }
 
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, QR_SIZE, QR_SIZE);
 
-  /*
-   * FRAME SOCIAL
-   *
-   * O ícone SVG é desenhado no Canvas.
-   */
-
-  function drawSocialFrame(
-    text,
-    color,
-    centerX,
-    centerY
-  ) {
-
-    const button =
-      document.querySelector(
-        `.social-button[data-social="${currentSocial}"]`
-      );
-
-
-    if (!button) {
-      return;
-    }
-
-
-    const svg =
-      button.querySelector("svg");
-
-
-    if (!svg) {
-      return;
-    }
-
-
-    const svgData =
-      new XMLSerializer()
-        .serializeToString(svg)
-        .replace(
-          /currentColor/g,
-          "#FFFFFF"
-        );
-
-
-    const blob =
-      new Blob(
-        [svgData],
-        {
-          type: "image/svg+xml"
-        }
-      );
-
-
-    const url =
-      URL.createObjectURL(blob);
-
-
-    const image =
-      new Image();
-
-
-    image.onload = function () {
-
-      const iconSize = 32;
-      const gap = 12;
-
-      const maxTextWidth =
-        canvas.width - 100;
-
-
-      const fontSize =
-        fitText(
-          ctx,
-          text,
-          maxTextWidth - iconSize - gap,
-          20
-        );
-
-
-      ctx.font =
-        `700 ${fontSize}px Arial`;
-
-
-      const textWidth =
-        ctx.measureText(text).width;
-
-
-      const totalWidth =
-        iconSize +
-        gap +
-        textWidth;
-
-
-      const startX =
-        centerX -
-        totalWidth / 2;
-
-
-      ctx.drawImage(
-        image,
-        startX,
-        centerY - iconSize / 2,
-        iconSize,
-        iconSize
-      );
-
-
-      ctx.textAlign = "left";
-
-      ctx.fillText(
-        text,
-        startX + iconSize + gap,
-        centerY
-      );
-
-
-      URL.revokeObjectURL(url);
-
-    };
-
-
-    image.src = url;
-
+  const bar = layout.bar;
+  ctx.fillStyle = frameColor;
+  if (rounded) {
+    roundedRect(ctx, bar.x, bar.y, bar.w, bar.h, 16);
+    ctx.fill();
+  } else {
+    ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
   }
 
+  ctx.fillStyle = "#FFFFFF";
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
 
-  /*
-   * GERA
-   */
+  if (currentFrame === "social") {
+    drawSocialFrame(frameText, bar.x + bar.w / 2, bar.y + bar.h / 2, bar.w);
+    document.getElementById("preview-info").textContent =
+      `PNG • ${canvas.width} × ${canvas.height} px • frame social`;
+    return;
+  }
 
-  function generate() {
+  if (layout.orientation === "v") {
+    ctx.save();
+    ctx.translate(bar.x + bar.w / 2, bar.y + bar.h / 2);
+    ctx.rotate((Math.PI / 2) * layout.rotate);
+    const fontSize = fitText(ctx, frameText, bar.h - 40, 20);
+    ctx.font = `700 ${fontSize}px Arial`;
+    ctx.fillText(frameText, 0, 0);
+    ctx.restore();
+  } else {
+    const fontSize = fitText(ctx, frameText, bar.w - 40, 21);
+    ctx.font = `700 ${fontSize}px Arial`;
+    ctx.fillText(frameText, bar.x + bar.w / 2, bar.y + bar.h / 2);
+  }
 
-    if (!input.value.trim()) {
+  document.getElementById("preview-info").textContent =
+    `PNG • ${canvas.width} × ${canvas.height} px • QR 500 × 500`;
+}
 
-      input.focus();
+function drawSocialFrame(text, centerX, centerY, barWidth) {
+  const button = document.querySelector(`.social-button[data-social="${currentSocial}"]`);
+  if (!button) return;
+  const svg = button.querySelector("svg");
+  if (!svg) return;
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([svgData], { type: "image/svg+xml" });
+  const url = URL.createObjectURL(blob);
+  const image = new Image();
+  image.onload = function () {
+    const iconSize = 34;
+    const gap = 12;
+    const maxTextWidth = barWidth - 90;
+    const fontSize = fitText(ctx, text, maxTextWidth - iconSize - gap, 20);
+    ctx.font = `700 ${fontSize}px Arial`;
+    const textWidth = ctx.measureText(text).width;
+    const totalWidth = iconSize + gap + textWidth;
+    const startX = centerX - totalWidth / 2;
+    ctx.save();
+    roundedRect(ctx, startX, centerY - iconSize / 2, iconSize, iconSize, 8);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fill();
+    ctx.clip();
+    ctx.drawImage(image, startX + 3, centerY - iconSize / 2 + 3, iconSize - 6, iconSize - 6);
+    ctx.restore();
+    ctx.fillStyle = "#FFFFFF";
+    ctx.textAlign = "left";
+    ctx.fillText(text, startX + iconSize + gap, centerY);
+    URL.revokeObjectURL(url);
+  };
+  image.src = url;
+}
 
-      return;
+function generate() {
+  if (!input.value.trim()) {
+    input.focus();
+    return;
+  }
+  updatePreview();
+  preview.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
 
-    }
+function downloadQRCode() {
+  if (!canvas.width) return;
+  const link = document.createElement("a");
+  link.download = `qrcode-${canvas.width}x${canvas.height}.png`;
+  link.href = canvas.toDataURL("image/png");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
-
+function updatePreview() {
+  if (input.value.trim()) {
     preview.classList.add("visible");
-
-    downloadButton.style.display =
-      "block";
-
-
+    downloadButton.style.display = "block";
     render();
-
+  } else {
+    preview.classList.remove("visible");
+    downloadButton.style.display = "none";
   }
+}
 
+function schedulePreview() {
+  clearTimeout(renderTimeout);
+  renderTimeout = setTimeout(updatePreview, 2000);
+}
 
-  /*
-   * DOWNLOAD
-   */
-
-  function downloadQRCode() {
-
-    if (!canvas.width) {
-      return;
-    }
-
-
-    const link =
-      document.createElement("a");
-
-
-    link.download =
-      `qrcode-${canvas.width}x${canvas.height}.png`;
-
-
-    link.href =
-      canvas.toDataURL("image/png");
-
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    document.body.removeChild(link);
-
-  }
-
-
-  /*
-   * ATUALIZAÇÃO AUTOMÁTICA
-   */
-
-  function renderIfReady() {
-
-    if (
-      input.value.trim() &&
-      preview.classList.contains("visible")
-    ) {
-
-      render();
-
-    }
-
-  }
-
-
-  /*
-   * CONTADOR
-   */
-
-  input.addEventListener(
-    "input",
-    function () {
-
-      updateCounter();
-
-      renderIfReady();
-
-    }
-  );
-
-
-  /*
-   * BOTÃO GERAR
-   */
-
-  document
-    .getElementById("generate-button")
-    .addEventListener(
-      "click",
-      generate
-    );
-
-
-  /*
-   * DOWNLOAD
-   */
-
-  downloadButton.addEventListener(
-    "click",
-    downloadQRCode
-  );
-
-
-  /*
-   * LIMPAR
-   */
-
-  document
-    .getElementById("clear-button")
-    .addEventListener(
-      "click",
-      function () {
-
-        input.value = "";
-
-        updateCounter();
-
-        preview.classList.remove(
-          "visible"
-        );
-
-        downloadButton.style.display =
-          "none";
-
-        input.focus();
-
-      }
-    );
-
-
-  /*
-   * CORES PREDEFINIDAS
-   */
-
-  document
-    .querySelectorAll(".swatch")
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            document
-              .querySelectorAll(".swatch")
-              .forEach(
-                item =>
-                  item.classList.remove(
-                    "active"
-                  )
-              );
-
-
-            this.classList.add(
-              "active"
-            );
-
-
-            qrColor =
-              this.dataset.color
-                .toUpperCase();
-
-
-            document
-              .getElementById("qr-color")
-              .value = qrColor;
-
-
-            document
-              .getElementById("qr-color-picker")
-              .value = qrColor;
-
-
-            renderIfReady();
-
-          }
-        );
-
-      }
-    );
-
-
-  /*
-   * COR HEX DO QR
-   */
-
-  document
-    .getElementById("qr-color")
-    .addEventListener(
-      "input",
-      function () {
-
-        if (!isValidHex(this.value)) {
-          return;
-        }
-
-
-        qrColor =
-          this.value.toUpperCase();
-
-
-        document
-          .getElementById("qr-color-picker")
-          .value = qrColor;
-
-
-        renderIfReady();
-
-      }
-    );
-
-
-  /*
-   * COLOR PICKER DO QR
-   */
-
-  document
-    .getElementById("qr-color-picker")
-    .addEventListener(
-      "input",
-      function () {
-
-        qrColor =
-          this.value.toUpperCase();
-
-
-        document
-          .getElementById("qr-color")
-          .value = qrColor;
-
-
-        renderIfReady();
-
-      }
-    );
-
-
-  /*
-   * FUNDO HEX
-   */
-
-  document
-    .getElementById("bg-color")
-    .addEventListener(
-      "input",
-      function () {
-
-        if (!isValidHex(this.value)) {
-          return;
-        }
-
-
-        backgroundColor =
-          this.value.toUpperCase();
-
-
-        document
-          .getElementById("bg-color-picker")
-          .value =
-          backgroundColor;
-
-
-        renderIfReady();
-
-      }
-    );
-
-
-  /*
-   * COLOR PICKER DO FUNDO
-   */
-
-  document
-    .getElementById("bg-color-picker")
-    .addEventListener(
-      "input",
-      function () {
-
-        backgroundColor =
-          this.value.toUpperCase();
-
-
-        document
-          .getElementById("bg-color")
-          .value =
-          backgroundColor;
-
-
-        renderIfReady();
-
-      }
-    );
-
-
-  /*
-   * FRAMES
-   */
-
-  document
-    .querySelectorAll(".frame-button")
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            document
-              .querySelectorAll(".frame-button")
-              .forEach(
-                item =>
-                  item.classList.remove(
-                    "active"
-                  )
-              );
-
-
-            this.classList.add(
-              "active"
-            );
-
-
-            currentFrame =
-              this.dataset.frame;
-
-
-            document
-              .getElementById("frame-options")
-              .style.display =
-              currentFrame === "none"
-                ? "none"
-                : "block";
-
-
-            document
-              .getElementById("social-options")
-              .style.display =
-              currentFrame === "social"
-                ? "block"
-                : "none";
-
-
-            renderIfReady();
-
-          }
-        );
-
-      }
-    );
-
-
-  /*
-   * ESTILO DOS MÓDULOS
-   */
-
-  document
-    .getElementById("module-style")
-    .addEventListener(
-      "change",
-      renderIfReady
-    );
-
-
-  /*
-   * CORREÇÃO DE ERRO
-   */
-
-  document
-    .getElementById("error-level")
-    .addEventListener(
-      "change",
-      renderIfReady
-    );
-
-
-  /*
-   * TEXTO DO FRAME
-   */
-
-  document
-    .getElementById("frame-text")
-    .addEventListener(
-      "input",
-      renderIfReady
-    );
-
-
-  /*
-   * COR DO FRAME
-   */
-
-  document
-    .getElementById("frame-color")
-    .addEventListener(
-      "input",
-      function () {
-
-        if (!isValidHex(this.value)) {
-          return;
-        }
-
-
-        document
-          .getElementById("frame-color-picker")
-          .value =
-          this.value.toUpperCase();
-
-
-        renderIfReady();
-
-      }
-    );
-
-
-  /*
-   * COLOR PICKER DO FRAME
-   */
-
-  document
-    .getElementById("frame-color-picker")
-    .addEventListener(
-      "input",
-      function () {
-
-        document
-          .getElementById("frame-color")
-          .value =
-          this.value.toUpperCase();
-
-
-        renderIfReady();
-
-      }
-    );
-
-
-  /*
-   * REDES SOCIAIS
-   */
-
-  document
-    .querySelectorAll(".social-button")
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            document
-              .querySelectorAll(".social-button")
-              .forEach(
-                item =>
-                  item.classList.remove(
-                    "active"
-                  )
-              );
-
-
-            this.classList.add(
-              "active"
-            );
-
-
-            currentSocial =
-              this.dataset.social;
-
-
-            document
-              .getElementById("frame-text")
-              .value =
-              socialTexts[currentSocial];
-
-
-            renderIfReady();
-
-          }
-        );
-
-      }
-    );
-
-
-  /*
-   * INICIALIZAÇÃO
-   */
-
+input.addEventListener("input", function () {
   updateCounter();
+  schedulePreview();
+});
 
+input.addEventListener("blur", function () {
+  clearTimeout(renderTimeout);
+  updatePreview();
+});
+
+document.getElementById("generate-button").addEventListener("click", generate);
+downloadButton.addEventListener("click", downloadQRCode);
+
+document.getElementById("clear-button").addEventListener("click", function () {
+  input.value = "";
+  updateCounter();
+  clearTimeout(renderTimeout);
+  preview.classList.remove("visible");
+  downloadButton.style.display = "none";
+  input.focus();
+});
+
+document.querySelectorAll(".swatch").forEach(button => {
+  button.addEventListener("click", function () {
+    document.querySelectorAll(".swatch").forEach(item => item.classList.remove("active"));
+    this.classList.add("active");
+    qrColor = this.dataset.color.toUpperCase();
+    document.getElementById("qr-color").value = qrColor;
+    document.getElementById("qr-color-picker").value = qrColor;
+    schedulePreview();
+  });
+});
+
+document.getElementById("qr-color").addEventListener("input", function () {
+  if (!isValidHex(this.value)) return;
+  qrColor = this.value.toUpperCase();
+  document.getElementById("qr-color-picker").value = qrColor;
+  schedulePreview();
+});
+
+document.getElementById("qr-color-picker").addEventListener("input", function () {
+  qrColor = this.value.toUpperCase();
+  document.getElementById("qr-color").value = qrColor;
+  schedulePreview();
+});
+
+document.getElementById("bg-color").addEventListener("input", function () {
+  if (!isValidHex(this.value)) return;
+  backgroundColor = this.value.toUpperCase();
+  document.getElementById("bg-color-picker").value = backgroundColor;
+  schedulePreview();
+});
+
+document.getElementById("bg-color-picker").addEventListener("input", function () {
+  backgroundColor = this.value.toUpperCase();
+  document.getElementById("bg-color").value = backgroundColor;
+  schedulePreview();
+});
+
+document.querySelectorAll(".frame-button").forEach(button => {
+  button.addEventListener("click", function () {
+    document.querySelectorAll(".frame-button").forEach(item => item.classList.remove("active"));
+    this.classList.add("active");
+    currentFrame = this.dataset.frame;
+    document.getElementById("frame-options").style.display = currentFrame === "none" ? "none" : "block";
+    document.getElementById("social-options").style.display = currentFrame === "social" ? "block" : "none";
+    schedulePreview();
+  });
+});
+
+document.getElementById("module-style").addEventListener("change", schedulePreview);
+document.getElementById("error-level").addEventListener("change", schedulePreview);
+document.getElementById("frame-text").addEventListener("input", schedulePreview);
+document.getElementById("frame-rounded").addEventListener("change", schedulePreview);
+
+document.getElementById("frame-color").addEventListener("input", function () {
+  if (!isValidHex(this.value)) return;
+  document.getElementById("frame-color-picker").value = this.value.toUpperCase();
+  schedulePreview();
+});
+
+document.getElementById("frame-color-picker").addEventListener("input", function () {
+  document.getElementById("frame-color").value = this.value.toUpperCase();
+  schedulePreview();
+});
+
+document.querySelectorAll(".social-button").forEach(button => {
+  button.addEventListener("click", function () {
+    document.querySelectorAll(".social-button").forEach(item => item.classList.remove("active"));
+    this.classList.add("active");
+    currentSocial = this.dataset.social;
+    document.getElementById("frame-text").value = socialTexts[currentSocial];
+    schedulePreview();
+  });
+});
+
+updateCounter();
 </script>
-
 </body>
 </html>
