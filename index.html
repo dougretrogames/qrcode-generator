@@ -571,9 +571,9 @@ input[type="range"] {
           <input
             id="thickness-input"
             type="range"
-            min="24"
-            max="120"
-            step="2"
+            min="14"
+            max="224"
+            step="1"
             value="56"
           >
         </div>
@@ -651,12 +651,13 @@ const previewContainer = $("preview-container");
 const actions = $("actions");
 
 const GAP = 10;
+const FONT_FAMILY = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
 
 let size = 500;
 let fg = "#000000";
 let bg = "#FFFFFF";
 let frame = "none";
-let thick = 56;
+let thick = getDefaultFrameThickness();
 let social = "whatsapp";
 let timer;
 
@@ -673,10 +674,16 @@ const colors = [
   "#0891B2"
 ];
 
-/* Margem branca proporcional:
-   3% do tamanho selecionado, com mínimo de 4 px. */
 function getMargin() {
   return Math.max(4, Math.round(size * 0.03));
+}
+
+function getDefaultFrameThickness(qrSize = size) {
+  return Math.max(14, Math.round(qrSize * 0.112));
+}
+
+function getTextFont(fontSize) {
+  return `700 ${Math.round(fontSize)}px ${FONT_FAMILY}`;
 }
 
 $("swatches").innerHTML = colors.map((color, index) => `
@@ -815,7 +822,6 @@ function generateBaseQR() {
 
   const qrCanvas = document.createElement("canvas");
 
-  /* A imagem gerada tem exatamente o tamanho selecionado. */
   qrCanvas.width = size;
   qrCanvas.height = size;
 
@@ -963,7 +969,7 @@ function drawSocialIcon(context) {
   context.fill();
 
   context.fillStyle = "#FFFFFF";
-  context.font = `700 ${iconSize * 0.50}px Arial`;
+  context.font = `700 ${Math.round(iconSize * 0.50)}px ${FONT_FAMILY}`;
   context.textAlign = "center";
   context.textBaseline = "middle";
 
@@ -972,17 +978,17 @@ function drawSocialIcon(context) {
     social === "instagram" ? "◎" :
     "☎";
 
-  context.fillText(icon, center, center);
+  context.fillText(icon, Math.round(center), Math.round(center));
 }
 
 function fitText(context, text, maxWidth, initialSize) {
-  let fontSize = initialSize;
+  let fontSize = Math.max(10, Math.round(initialSize));
 
-  context.font = `700 ${fontSize}px Helvetica, Arial`;
+  context.font = getTextFont(fontSize);
 
   while (context.measureText(text).width > maxWidth && fontSize > 10) {
     fontSize--;
-    context.font = `700 ${fontSize}px Helvetica, Arial`;
+    context.font = getTextFont(fontSize);
   }
 
   return fontSize;
@@ -996,16 +1002,14 @@ async function render() {
 
   drawSocialIcon(qrCanvas.getContext("2d"));
 
-  /* Sem DPR: o PNG fica exatamente no tamanho selecionado. */
   canvas.width = Math.round(layout.width);
   canvas.height = Math.round(layout.height);
 
-  /* Apenas a visualização é reduzida para caber na coluna.
-     A proporção é sempre a mesma do arquivo exportado. */
   previewContainer.style.width = `min(100%, ${layout.width}px)`;
   previewContainer.style.aspectRatio = `${layout.width} / ${layout.height}`;
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.textRendering = "geometricPrecision";
 
   const frameColor = isHex($("frame-color").value)
     ? $("frame-color").value
@@ -1032,17 +1036,19 @@ async function render() {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    ctx.font = `700 ${fitText(
-      ctx,
-      frameText,
-      layout.width - 50,
-      Math.round(thick * 0.42)
-    )}px Helvetica, Arial`;
+    ctx.font = getTextFont(
+      fitText(
+        ctx,
+        frameText,
+        layout.width - 50,
+        thick * 0.42
+      )
+    );
 
     ctx.fillText(
       frameText,
-      layout.width / 2,
-      layout.qrY + size + layout.bottomHeight / 2
+      Math.round(layout.width / 2),
+      Math.round(layout.qrY + size + layout.bottomHeight / 2)
     );
   } else {
     ctx.fillStyle = bg;
@@ -1074,30 +1080,38 @@ async function render() {
     if (direction === "vertical") {
       ctx.save();
 
-      ctx.translate(x + width / 2, y + height / 2);
+      ctx.translate(
+        Math.round(x + width / 2),
+        Math.round(y + height / 2)
+      );
+
       ctx.rotate(Math.PI / 2 * rotation);
 
-      ctx.font = `700 ${fitText(
-        ctx,
-        frameText,
-        height - 40,
-        Math.round(width * 0.42)
-      )}px Helvetica, Arial`;
+      ctx.font = getTextFont(
+        fitText(
+          ctx,
+          frameText,
+          height - 40,
+          width * 0.42
+        )
+      );
 
       ctx.fillText(frameText, 0, 0);
       ctx.restore();
     } else {
-      ctx.font = `700 ${fitText(
-        ctx,
-        frameText,
-        width - 40,
-        Math.round(height * 0.42)
-      )}px Helvetica, Arial`;
+      ctx.font = getTextFont(
+        fitText(
+          ctx,
+          frameText,
+          width - 40,
+          height * 0.42
+        )
+      );
 
       ctx.fillText(
         frameText,
-        x + width / 2,
-        y + height / 2
+        Math.round(x + width / 2),
+        Math.round(y + height / 2)
       );
     }
   }
@@ -1139,6 +1153,13 @@ $("clear").addEventListener("click", () => {
 
 $("size").addEventListener("change", event => {
   size = Number(event.target.value);
+
+  /* Ajusta a espessura padrão de acordo com o novo tamanho. */
+  thick = getDefaultFrameThickness(size);
+
+  $("thickness-input").value = thick;
+  $("thickness-value").textContent = thick;
+
   schedulePreview();
 });
 
