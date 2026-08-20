@@ -211,6 +211,7 @@ input, select {
           <option value="rounded">Arredondado</option>
           <option value="dot">Pontos</option>
           <option value="soft">Arredondado suave</option>
+          <option value="circle">Círculo</option>
         </select>
       </div>
       <div class="field">
@@ -451,13 +452,13 @@ function drawModule(context, x, y, size, style) {
     context.fillRect(Math.round(x), Math.round(y), Math.ceil(size), Math.ceil(size));
     return;
   }
-  if (style === "dot") {
+  if (style === "dot" || style === "circle") {
     context.beginPath();
     context.arc(x + size / 2, y + size / 2, size * 0.43, 0, Math.PI * 2);
     context.fill();
     return;
   }
-  let radius = style === "soft" ? size * 0.30 : size * 0.43;
+  let radius = style === "soft" ? size * 0.30 : size * 0.50;
   roundedRect(context, x + 0.15, y + 0.15, size - 0.3, size - 0.3, radius);
   context.fill();
 }
@@ -469,9 +470,27 @@ function drawFinderPattern(context, x, y, moduleSize, style, color, bgColor) {
   const midOffset = moduleSize;
   const innerOffset = moduleSize * 2;
 
+  if (style === "circle") {
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(x + outer / 2, y + outer / 2, outer / 2, 0, Math.PI * 2);
+    context.fill();
+
+    context.fillStyle = bgColor;
+    context.beginPath();
+    context.arc(x + outer / 2, y + outer / 2, middle / 2, 0, Math.PI * 2);
+    context.fill();
+
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(x + outer / 2, y + outer / 2, inner / 2, 0, Math.PI * 2);
+    context.fill();
+    return;
+  }
+
   let outerRadius = 0, innerRadius = 0;
   if (style === "dot") { outerRadius = outer * 0.28; innerRadius = inner * 0.42; }
-  else if (style === "rounded") { outerRadius = outer * 0.24; innerRadius = inner * 0.35; }
+  else if (style === "rounded") { outerRadius = outer * 0.30; innerRadius = inner * 0.45; }
   else if (style === "soft") { outerRadius = outer * 0.16; innerRadius = inner * 0.22; }
 
   context.fillStyle = color;
