@@ -746,10 +746,18 @@ function getIconBorderThickness() {
 }
 
 function getIconContentPadding() {
-  return Math.max(
-    6,
-    Math.round(size * 0.024)
-  );
+  const paddingBySize = {
+    125: 3,
+    250: 6,
+    375: 9,
+    500: 12,
+    625: 15,
+    750: 18,
+    875: 21,
+    1000: 24
+  };
+
+  return paddingBySize[size] ?? 12;
 }
 
 function isHex(value) {
