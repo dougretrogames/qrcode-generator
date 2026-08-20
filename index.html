@@ -5,90 +5,460 @@
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#6D5DFC">
 <title>Gerador de QR Code</title>
+
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+
 <style>
-:root{--primary:#6D5DFC;--bg:#f4f5fb;--card:#fff;--text:#171827;--muted:#777b8c;--border:#e3e5ed}
-*{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;padding:20px 14px;background:radial-gradient(circle at 10% 0,#6d5dfc22,transparent 32%),var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text)}
-.app{width:min(100%,700px);margin:auto;padding:28px;background:var(--card);border-radius:20px;box-shadow:0 18px 55px #1c1e341a}
-.header{text-align:center;margin-bottom:25px}
-.logo{width:54px;height:54px;margin:0 auto 14px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(135deg,#6D5DFC,#897DFF);box-shadow:0 10px 25px #6D5DFC40}
-.logo:before{content:"";width:22px;height:22px;border:4px solid #fff;border-radius:4px}
-h1{font-size:1.7rem;letter-spacing:-.03em}
-.subtitle{margin-top:7px;color:var(--muted);font-size:.94rem}
-.label{display:flex;justify-content:space-between;margin-bottom:7px;font-size:.88rem;font-weight:700}
-.counter{color:var(--muted);font-weight:500}
-.input-wrap{position:relative}
-textarea,input,select{width:100%;border:1px solid var(--border);border-radius:10px;background:#fafbfe;color:var(--text);font:inherit;font-size:16px;outline:0}
-textarea{display:block;min-height:105px;resize:vertical;padding:14px 45px 14px 15px;line-height:1.45}
-textarea:focus,input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px #6D5DFC18;background:#fff}
-.clear{position:absolute;top:9px;right:9px;width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:#9296a5;font-size:22px;cursor:pointer}
-.customization{margin-top:22px;padding-top:22px;border-top:1px solid var(--border)}
-.section-title{margin-bottom:14px;font-weight:800}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.field{margin-bottom:14px}
-.field-label{display:block;margin-bottom:7px;font-size:.81rem;font-weight:700}
-input,select{height:44px;padding:0 11px}
-.hex-row{display:flex;gap:8px}
-.color-picker{width:48px;padding:3px;cursor:pointer}
-.hex-input{flex:1;text-transform:uppercase}
-.swatches{display:flex;flex-wrap:wrap;gap:10px}
-.swatch{width:36px;height:36px;border:2px solid #fff;outline:1px solid #d9dbe4;border-radius:50%;cursor:pointer}
-.swatch.active{outline:2px solid var(--primary);outline-offset:2px}
-.frames{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:8px}
-.frame-btn,.social-btn{min-height:52px;border:1px solid var(--border);border-radius:10px;background:#fafbfe;color:var(--muted);font:inherit;font-size:.76rem;font-weight:650;cursor:pointer}
-.frame-btn.active,.social-btn.active{border-color:var(--primary);color:var(--primary);background:#6D5DFC0D;box-shadow:inset 0 0 0 1px var(--primary)}
-.thickness,.frame-options{display:none}
-.thickness.visible,.frame-options.visible{display:block}
-.thickness-value{color:var(--primary);font-weight:800}
-input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-color:var(--primary);cursor:pointer}
-.check{display:flex;gap:9px;align-items:center;font-size:.86rem;font-weight:650;cursor:pointer}
-.check input{width:19px;height:19px;accent-color:var(--primary)}
-.icon-options{margin-top:18px;padding-top:18px;border-top:1px dashed var(--border)}
-.socials{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.socials.visible{display:grid}
-.social-btn{min-height:48px}
-.notice{display:none;margin-top:10px;padding:9px 12px;border-radius:9px;background:#6D5DFC12;color:var(--primary);font-size:.78rem;font-weight:650}
-.notice.visible{display:block}
-.preview{display:none;margin-top:23px;padding-top:23px;border-top:1px solid var(--border);text-align:center}
-.preview.visible{display:block}
-.preview-container{width:100%;max-width:100%;margin:auto;padding:0;overflow:hidden}
-#qr-canvas{display:block;width:100%;height:100%}
-.preview-info{margin-top:11px;color:var(--muted);font-size:.8rem}
-.actions{display:none;gap:10px;margin-top:14px}
-.actions.visible{display:flex}
-.action{flex:1;min-height:50px;border-radius:12px;font:inherit;font-weight:750;cursor:pointer}
-.download{border:0;color:#fff;background:linear-gradient(135deg,#6D5DFC,#7B6CFF);box-shadow:0 8px 18px #6D5DFC38}
-.share{color:var(--primary);border:1px solid var(--primary);background:#6D5DFC0D;box-shadow:inset 0 0 0 1px var(--primary)}
-.footer{margin-top:20px;text-align:center;color:#9a9daa;font-size:.75rem}
-
-@media(min-width:900px){
-  body{display:flex;align-items:center}
-  .app{width:min(100%,980px)}
-  .app-inner{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:40px;align-items:start}
-  .preview{margin-top:0;padding-top:0;border-top:0}
+:root {
+  --primary: #6D5DFC;
+  --bg: #f4f5fb;
+  --card: #ffffff;
+  --text: #171827;
+  --muted: #777b8c;
+  --border: #e3e5ed;
 }
 
-@media(max-width:600px){
-  .app{padding:20px 16px}
-  .grid{grid-template-columns:1fr}
-  .socials{grid-template-columns:repeat(2,1fr)}
-  .actions.visible{flex-direction:column}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media(prefers-color-scheme:dark){
-  :root{--bg:#12131c;--card:#1b1c29;--text:#f2f2f7;--muted:#9498a8;--border:#2c2e40}
-  textarea,input,select,.frame-btn,.social-btn{background:#22233350;color:var(--text)}
-  textarea:focus,input:focus,select:focus{background:#22233370}
+body {
+  min-height: 100vh;
+  padding: 20px 14px;
+  background:
+    radial-gradient(circle at 10% 0%, #6d5dfc22, transparent 32%),
+    var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+}
+
+.app {
+  width: min(100%, 700px);
+  margin: auto;
+  padding: 28px;
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 18px 55px #1c1e341a;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.logo {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6D5DFC, #897DFF);
+  box-shadow: 0 10px 25px #6D5DFC40;
+}
+
+.logo::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border: 4px solid white;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: 1.7rem;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.counter {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+textarea,
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fafbfe;
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  outline: 0;
+}
+
+textarea {
+  display: block;
+  min-height: 105px;
+  resize: vertical;
+  padding: 14px 45px 14px 15px;
+  line-height: 1.45;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px #6D5DFC18;
+  background: white;
+}
+
+.clear {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #9296a5;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.customization {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+.section-title {
+  margin-bottom: 14px;
+  font-weight: 800;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.81rem;
+  font-weight: 700;
+}
+
+input,
+select {
+  height: 44px;
+  padding: 0 11px;
+}
+
+.hex-row {
+  display: flex;
+  gap: 8px;
+}
+
+.color-picker {
+  width: 48px;
+  padding: 3px;
+  cursor: pointer;
+}
+
+.hex-input {
+  flex: 1;
+  text-transform: uppercase;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.swatch {
+  width: 36px;
+  height: 36px;
+  border: 2px solid white;
+  outline: 1px solid #d9dbe4;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.swatch.active {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.frames {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.frame-btn,
+.social-btn {
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fafbfe;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.frame-btn.active,
+.social-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #6D5DFC0D;
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.thickness,
+.frame-options {
+  display: none;
+}
+
+.thickness.visible,
+.frame-options.visible {
+  display: block;
+}
+
+.thickness-value {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+input[type="range"] {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.86rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.check input {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--primary);
+}
+
+.icon-options {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border);
+}
+
+.socials {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.socials.visible {
+  display: grid;
+}
+
+.social-btn {
+  min-height: 48px;
+}
+
+.notice {
+  display: none;
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: #6D5DFC12;
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.notice.visible {
+  display: block;
+}
+
+.preview {
+  display: none;
+  margin-top: 23px;
+  padding-top: 23px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.preview.visible {
+  display: block;
+}
+
+.preview-container {
+  width: 100%;
+  max-width: 100%;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+#qr-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.preview-info {
+  margin-top: 11px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: none;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.actions.visible {
+  display: flex;
+}
+
+.action {
+  flex: 1;
+  min-height: 50px;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.download {
+  border: 0;
+  color: white;
+  background: linear-gradient(135deg, #6D5DFC, #7B6CFF);
+  box-shadow: 0 8px 18px #6D5DFC38;
+}
+
+.share {
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  background: #6D5DFC0D;
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.footer {
+  margin-top: 20px;
+  text-align: center;
+  color: #9a9daa;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 900px) {
+  body {
+    display: flex;
+    align-items: center;
+  }
+
+  .app {
+    width: min(100%, 980px);
+  }
+
+  .app-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .preview {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding: 20px 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .socials {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .actions.visible {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12131c;
+    --card: #1b1c29;
+    --text: #f2f2f7;
+    --muted: #9498a8;
+    --border: #2c2e40;
+  }
+
+  textarea,
+  input,
+  select,
+  .frame-btn,
+  .social-btn {
+    background: #22233350;
+    color: var(--text);
+  }
+
+  textarea:focus,
+  input:focus,
+  select:focus {
+    background: #22233370;
+  }
 }
 </style>
 </head>
+
 <body>
 <main class="app">
   <header class="header">
     <div class="logo"></div>
     <h1>Gerador de QR Code</h1>
-    <p class="subtitle">Crie, personalize e baixe seu QR Code em PNG — com pré-visualização em tempo real.</p>
+    <p class="subtitle">
+      Crie, personalize e baixe seu QR Code em PNG — com pré-visualização em tempo real.
+    </p>
   </header>
 
   <div class="app-inner">
@@ -99,8 +469,16 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
       </div>
 
       <div class="input-wrap">
-        <textarea id="qr-text" maxlength="2000" placeholder="Cole um link ou digite qualquer texto..." spellcheck="false"></textarea>
-        <button id="clear" class="clear" type="button" aria-label="Limpar">×</button>
+        <textarea
+          id="qr-text"
+          maxlength="2000"
+          placeholder="Cole um link ou digite qualquer texto..."
+          spellcheck="false"
+        ></textarea>
+
+        <button id="clear" class="clear" type="button" aria-label="Limpar">
+          ×
+        </button>
       </div>
 
       <section class="customization">
@@ -109,6 +487,7 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
         <div class="grid">
           <div class="field">
             <label class="field-label">Formato dos pixels</label>
+
             <select id="style">
               <option value="square">Quadrado</option>
               <option value="rounded">Arredondado</option>
@@ -120,6 +499,7 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
 
           <div class="field">
             <label class="field-label">Correção de erro</label>
+
             <select id="ecc">
               <option value="H">Alta — H</option>
               <option value="Q">Boa — Q</option>
@@ -131,15 +511,16 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
 
         <div class="field">
           <label class="field-label">Tamanho do QR Code</label>
+
           <select id="size">
-            <option>125</option>
-            <option>250</option>
-            <option>375</option>
-            <option selected>500</option>
-            <option>625</option>
-            <option>750</option>
-            <option>875</option>
-            <option>1000</option>
+            <option value="125">125 px</option>
+            <option value="250">250 px</option>
+            <option value="375">375 px</option>
+            <option value="500" selected>500 px</option>
+            <option value="625">625 px</option>
+            <option value="750">750 px</option>
+            <option value="875">875 px</option>
+            <option value="1000">1000 px</option>
           </select>
         </div>
 
@@ -151,6 +532,7 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
         <div class="grid">
           <div class="field">
             <label class="field-label">Cor do QR — HEX</label>
+
             <div class="hex-row">
               <input id="fg-picker" class="color-picker" type="color" value="#000000">
               <input id="fg" class="hex-input" value="#000000" maxlength="7">
@@ -159,6 +541,7 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
 
           <div class="field">
             <label class="field-label">Cor do fundo — HEX</label>
+
             <div class="hex-row">
               <input id="bg-picker" class="color-picker" type="color" value="#FFFFFF">
               <input id="bg" class="hex-input" value="#FFFFFF" maxlength="7">
@@ -168,6 +551,7 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
 
         <div class="field">
           <label class="field-label">Posição do frame</label>
+
           <div id="frames" class="frames">
             <button class="frame-btn active" data-frame="none">Nenhum</button>
             <button class="frame-btn" data-frame="top">Superior</button>
@@ -183,7 +567,15 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
             Espessura do frame —
             <span id="thickness-value" class="thickness-value">56</span> px
           </label>
-          <input id="thickness-input" type="range" min="24" max="120" step="2" value="56">
+
+          <input
+            id="thickness-input"
+            type="range"
+            min="24"
+            max="120"
+            step="2"
+            value="56"
+          >
         </div>
 
         <div id="frame-options" class="frame-options">
@@ -195,6 +587,7 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
 
             <div class="field">
               <label class="field-label">Cor do frame</label>
+
               <div class="hex-row">
                 <input id="frame-picker" class="color-picker" type="color" value="#6D5DFC">
                 <input id="frame-color" class="hex-input" value="#6D5DFC" maxlength="7">
@@ -232,6 +625,7 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
         <div id="preview-container" class="preview-container">
           <canvas id="qr-canvas"></canvas>
         </div>
+
         <p id="info" class="preview-info"></p>
       </section>
 
@@ -242,7 +636,9 @@ input[type=range]{height:auto;padding:0;border:0;background:transparent;accent-c
     </div>
   </div>
 
-  <footer class="footer">Tudo é processado localmente no navegador.</footer>
+  <footer class="footer">
+    Tudo é processado localmente no navegador.
+  </footer>
 </main>
 
 <script>
@@ -251,11 +647,9 @@ const $ = id => document.getElementById(id);
 const canvas = $("qr-canvas");
 const ctx = canvas.getContext("2d");
 const preview = $("preview");
-const box = $("preview-container");
+const previewContainer = $("preview-container");
 const actions = $("actions");
 
-const DPR = Math.min(devicePixelRatio || 1, 3);
-const MARGIN = 15;
 const GAP = 10;
 
 let size = 500;
@@ -267,13 +661,32 @@ let social = "whatsapp";
 let timer;
 
 const colors = [
-  "#000000", "#1F2937", "#2563EB", "#6D5DFC", "#7C3AED",
-  "#DB2777", "#DC2626", "#EA580C", "#16A34A", "#0891B2"
+  "#000000",
+  "#1F2937",
+  "#2563EB",
+  "#6D5DFC",
+  "#7C3AED",
+  "#DB2777",
+  "#DC2626",
+  "#EA580C",
+  "#16A34A",
+  "#0891B2"
 ];
 
-$("swatches").innerHTML = colors.map((color, index) =>
-  `<button class="swatch ${index ? "" : "active"}" data-color="${color}" style="background:${color}" aria-label="${color}"></button>`
-).join("");
+/* Margem branca proporcional:
+   3% do tamanho selecionado, com mínimo de 4 px. */
+function getMargin() {
+  return Math.max(4, Math.round(size * 0.03));
+}
+
+$("swatches").innerHTML = colors.map((color, index) => `
+  <button
+    class="swatch ${index ? "" : "active"}"
+    data-color="${color}"
+    style="background:${color}"
+    aria-label="${color}"
+  ></button>
+`).join("");
 
 function isHex(value) {
   return /^#[0-9a-f]{6}$/i.test(value);
@@ -281,6 +694,7 @@ function isHex(value) {
 
 function roundedRect(context, x, y, width, height, radius) {
   radius = Math.min(radius, width / 2, height / 2);
+
   context.beginPath();
   context.roundRect(x, y, width, height, radius);
   context.closePath();
@@ -293,13 +707,24 @@ function schedulePreview() {
 
 function drawModule(context, x, y, moduleSize, type) {
   if (type === "square") {
-    context.fillRect(Math.round(x), Math.round(y), Math.ceil(moduleSize), Math.ceil(moduleSize));
+    context.fillRect(
+      Math.round(x),
+      Math.round(y),
+      Math.ceil(moduleSize),
+      Math.ceil(moduleSize)
+    );
     return;
   }
 
   if (type === "dot" || type === "circle") {
     context.beginPath();
-    context.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize * 0.43, 0, Math.PI * 2);
+    context.arc(
+      x + moduleSize / 2,
+      y + moduleSize / 2,
+      moduleSize * 0.43,
+      0,
+      Math.PI * 2
+    );
     context.fill();
     return;
   }
@@ -312,6 +737,7 @@ function drawModule(context, x, y, moduleSize, type) {
     moduleSize - 0.3,
     type === "soft" ? moduleSize * 0.30 : moduleSize * 0.50
   );
+
   context.fill();
 }
 
@@ -321,30 +747,56 @@ function drawFinder(context, x, y, moduleSize, type) {
   const inner = moduleSize * 3;
 
   if (type === "circle") {
-    for (const [radius, color] of [[outer, fg], [middle, bg], [inner, fg]]) {
+    for (const [radius, color] of [
+      [outer, fg],
+      [middle, bg],
+      [inner, fg]
+    ]) {
       context.fillStyle = color;
       context.beginPath();
-      context.arc(x + outer / 2, y + outer / 2, radius / 2, 0, Math.PI * 2);
+      context.arc(
+        x + outer / 2,
+        y + outer / 2,
+        radius / 2,
+        0,
+        Math.PI * 2
+      );
       context.fill();
     }
+
     return;
   }
 
   const radius =
     type === "rounded" ? outer * 0.30 :
     type === "soft" ? outer * 0.16 :
-    type === "dot" ? outer * 0.28 : 0;
+    type === "dot" ? outer * 0.28 :
+    0;
 
   context.fillStyle = fg;
   roundedRect(context, x, y, outer, outer, radius);
   context.fill();
 
   context.fillStyle = bg;
-  roundedRect(context, x + moduleSize, y + moduleSize, middle, middle, Math.max(0, radius - moduleSize));
+  roundedRect(
+    context,
+    x + moduleSize,
+    y + moduleSize,
+    middle,
+    middle,
+    Math.max(0, radius - moduleSize)
+  );
   context.fill();
 
   context.fillStyle = fg;
-  roundedRect(context, x + moduleSize * 2, y + moduleSize * 2, inner, inner, type === "rounded" ? inner * 0.45 : 0);
+  roundedRect(
+    context,
+    x + moduleSize * 2,
+    y + moduleSize * 2,
+    inner,
+    inner,
+    type === "rounded" ? inner * 0.45 : 0
+  );
   context.fill();
 }
 
@@ -357,17 +809,21 @@ function generateBaseQR() {
   qr.make();
 
   const modules = qr.getModuleCount();
-  const totalSize = size * DPR;
-  const margin = MARGIN * DPR;
-  const moduleSize = ((size - MARGIN * 2) / modules) * DPR;
+  const margin = getMargin();
+  const usableSize = size - margin * 2;
+  const moduleSize = usableSize / modules;
 
   const qrCanvas = document.createElement("canvas");
-  qrCanvas.width = totalSize;
-  qrCanvas.height = totalSize;
+
+  /* A imagem gerada tem exatamente o tamanho selecionado. */
+  qrCanvas.width = size;
+  qrCanvas.height = size;
 
   const qrCtx = qrCanvas.getContext("2d");
+
   qrCtx.fillStyle = bg;
-  qrCtx.fillRect(0, 0, totalSize, totalSize);
+  qrCtx.fillRect(0, 0, size, size);
+
   qrCtx.fillStyle = fg;
 
   const finderZones = [
@@ -386,15 +842,17 @@ function generateBaseQR() {
 
   for (let row = 0; row < modules; row++) {
     for (let column = 0; column < modules; column++) {
-      if (qr.isDark(row, column) && !isFinder(row, column)) {
-        drawModule(
-          qrCtx,
-          margin + column * moduleSize,
-          margin + row * moduleSize,
-          moduleSize,
-          type
-        );
+      if (!qr.isDark(row, column) || isFinder(row, column)) {
+        continue;
       }
+
+      drawModule(
+        qrCtx,
+        margin + column * moduleSize,
+        margin + row * moduleSize,
+        moduleSize,
+        type
+      );
     }
   }
 
@@ -477,28 +935,29 @@ function getLayout() {
 function drawSocialIcon(context) {
   if (!$("icon-enabled").checked) return;
 
-  const colors = {
+  const networkColors = {
     whatsapp: "#25D366",
     instagram: "#D62976",
     youtube: "#FF0000"
   };
 
-  const total = size * DPR;
-  const iconSize = total * 0.20;
-  const center = total / 2;
+  const iconSize = size * 0.20;
+  const center = size / 2;
 
   context.fillStyle = "#FFFFFF";
+
   roundedRect(
     context,
-    center - iconSize / 2 - 12,
-    center - iconSize / 2 - 12,
-    iconSize + 24,
-    iconSize + 24,
+    center - iconSize / 2 - 6,
+    center - iconSize / 2 - 6,
+    iconSize + 12,
+    iconSize + 12,
     14
   );
+
   context.fill();
 
-  context.fillStyle = colors[social];
+  context.fillStyle = networkColors[social];
   context.beginPath();
   context.arc(center, center, iconSize * 0.47, 0, Math.PI * 2);
   context.fill();
@@ -508,15 +967,17 @@ function drawSocialIcon(context) {
   context.textAlign = "center";
   context.textBaseline = "middle";
 
-  const symbol =
+  const icon =
     social === "youtube" ? "▶" :
-    social === "instagram" ? "◎" : "☎";
+    social === "instagram" ? "◎" :
+    "☎";
 
-  context.fillText(symbol, center, center);
+  context.fillText(icon, center, center);
 }
 
 function fitText(context, text, maxWidth, initialSize) {
   let fontSize = initialSize;
+
   context.font = `700 ${fontSize}px Helvetica, Arial`;
 
   while (context.measureText(text).width > maxWidth && fontSize > 10) {
@@ -535,15 +996,16 @@ async function render() {
 
   drawSocialIcon(qrCanvas.getContext("2d"));
 
-  canvas.width = Math.round(layout.width * DPR);
-  canvas.height = Math.round(layout.height * DPR);
+  /* Sem DPR: o PNG fica exatamente no tamanho selecionado. */
+  canvas.width = Math.round(layout.width);
+  canvas.height = Math.round(layout.height);
 
-  /* Correção da visualização: a área sempre respeita
-     a proporção exata do PNG, sem distorção ou rolagem. */
-  box.style.width = `min(100%, ${layout.width}px)`;
-  box.style.aspectRatio = `${layout.width} / ${layout.height}`;
+  /* Apenas a visualização é reduzida para caber na coluna.
+     A proporção é sempre a mesma do arquivo exportado. */
+  previewContainer.style.width = `min(100%, ${layout.width}px)`;
+  previewContainer.style.aspectRatio = `${layout.width} / ${layout.height}`;
 
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   const frameColor = isHex($("frame-color").value)
     ? $("frame-color").value
@@ -569,7 +1031,13 @@ async function render() {
     ctx.fillStyle = "#FFFFFF";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `700 ${fitText(ctx, frameText, layout.width - 50, Math.round(thick * 0.42))}px Helvetica, Arial`;
+
+    ctx.font = `700 ${fitText(
+      ctx,
+      frameText,
+      layout.width - 50,
+      Math.round(thick * 0.42)
+    )}px Helvetica, Arial`;
 
     ctx.fillText(
       frameText,
@@ -579,7 +1047,14 @@ async function render() {
   } else {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, layout.width, layout.height);
-    ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, size, size);
+
+    ctx.drawImage(
+      qrCanvas,
+      layout.qrX,
+      layout.qrY,
+      size,
+      size
+    );
 
     const [x, y, width, height, direction, rotation] = layout.bar;
 
@@ -598,24 +1073,46 @@ async function render() {
 
     if (direction === "vertical") {
       ctx.save();
+
       ctx.translate(x + width / 2, y + height / 2);
       ctx.rotate(Math.PI / 2 * rotation);
-      ctx.font = `700 ${fitText(ctx, frameText, height - 40, Math.round(width * 0.42))}px Helvetica, Arial`;
+
+      ctx.font = `700 ${fitText(
+        ctx,
+        frameText,
+        height - 40,
+        Math.round(width * 0.42)
+      )}px Helvetica, Arial`;
+
       ctx.fillText(frameText, 0, 0);
       ctx.restore();
     } else {
-      ctx.font = `700 ${fitText(ctx, frameText, width - 40, Math.round(height * 0.42))}px Helvetica, Arial`;
-      ctx.fillText(frameText, x + width / 2, y + height / 2);
+      ctx.font = `700 ${fitText(
+        ctx,
+        frameText,
+        width - 40,
+        Math.round(height * 0.42)
+      )}px Helvetica, Arial`;
+
+      ctx.fillText(
+        frameText,
+        x + width / 2,
+        y + height / 2
+      );
     }
   }
 
-  $("info").textContent = `PNG • ${canvas.width} × ${canvas.height} px`;
+  const margin = getMargin();
+
+  $("info").textContent =
+    `PNG • ${canvas.width} × ${canvas.height} px • margem branca de ${margin} px`;
 }
 
 async function updatePreview() {
   if ($("qr-text").value.trim()) {
     preview.classList.add("visible");
     actions.classList.add("visible");
+
     await render();
   } else {
     preview.classList.remove("visible");
@@ -625,13 +1122,17 @@ async function updatePreview() {
 
 $("qr-text").addEventListener("input", () => {
   const total = $("qr-text").value.length;
-  $("counter").textContent = `${total} ${total === 1 ? "caractere" : "caracteres"}`;
+
+  $("counter").textContent =
+    `${total} ${total === 1 ? "caractere" : "caracteres"}`;
+
   schedulePreview();
 });
 
 $("clear").addEventListener("click", () => {
   $("qr-text").value = "";
   $("counter").textContent = "0 caracteres";
+
   updatePreview();
   $("qr-text").focus();
 });
@@ -646,7 +1147,9 @@ $("ecc").addEventListener("change", schedulePreview);
 
 $("thickness-input").addEventListener("input", event => {
   thick = Number(event.target.value);
+
   $("thickness-value").textContent = thick;
+
   schedulePreview();
 });
 
@@ -661,9 +1164,11 @@ $("frames").addEventListener("click", event => {
   });
 
   event.target.classList.add("active");
+
   frame = event.target.dataset.frame;
 
   const hasFrame = frame !== "none";
+
   $("thickness").classList.toggle("visible", hasFrame);
   $("frame-options").classList.toggle("visible", hasFrame);
 
@@ -678,6 +1183,7 @@ $("swatches").addEventListener("click", event => {
   });
 
   event.target.classList.add("active");
+
   fg = event.target.dataset.color;
 
   $("fg").value = fg;
@@ -690,15 +1196,23 @@ function bindColor(textId, pickerId, callback) {
   const update = value => {
     if (!isHex(value)) return;
 
-    callback(value.toUpperCase());
-    $(textId).value = value.toUpperCase();
-    $(pickerId).value = value.toUpperCase();
+    const normalized = value.toUpperCase();
+
+    callback(normalized);
+
+    $(textId).value = normalized;
+    $(pickerId).value = normalized;
 
     schedulePreview();
   };
 
-  $(textId).addEventListener("input", event => update(event.target.value));
-  $(pickerId).addEventListener("input", event => update(event.target.value));
+  $(textId).addEventListener("input", event => {
+    update(event.target.value);
+  });
+
+  $(pickerId).addEventListener("input", event => {
+    update(event.target.value);
+  });
 }
 
 bindColor("fg", "fg-picker", value => {
@@ -736,8 +1250,10 @@ $("socials").addEventListener("click", event => {
 
 $("download").addEventListener("click", () => {
   const link = document.createElement("a");
+
   link.download = `qrcode-${canvas.width}x${canvas.height}.png`;
   link.href = canvas.toDataURL("image/png");
+
   link.click();
 });
 
@@ -746,9 +1262,11 @@ $("share").addEventListener("click", async () => {
     canvas.toBlob(resolve, "image/png");
   });
 
-  const file = new File([blob], "qrcode.png", {
-    type: "image/png"
-  });
+  const file = new File(
+    [blob],
+    `qrcode-${canvas.width}x${canvas.height}.png`,
+    { type: "image/png" }
+  );
 
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     navigator.share({
