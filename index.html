@@ -11,7 +11,7 @@
 <style>
 :root {
   --primary: #6D5DFC;
-  --bg: #f4f5fb;
+  --background: #f4f5fb;
   --card: #ffffff;
   --text: #171827;
   --muted: #777b8c;
@@ -24,12 +24,17 @@
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   min-height: 100vh;
-  padding: 20px 14px;
+  padding: max(20px, env(safe-area-inset-top)) 14px max(20px, env(safe-area-inset-bottom));
   background:
     radial-gradient(circle at 10% 0%, #6d5dfc22, transparent 32%),
-    var(--bg);
+    radial-gradient(circle at 100% 100%, #6d5dfc18, transparent 30%),
+    var(--background);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   color: var(--text);
 }
@@ -40,19 +45,19 @@ body {
   padding: 28px;
   background: var(--card);
   border-radius: 20px;
-  box-shadow: 0 18px 55px #1c1e341a;
+  box-shadow: 0 18px 55px rgba(28, 30, 52, 0.1);
 }
 
 .header {
-  text-align: center;
   margin-bottom: 25px;
+  text-align: center;
 }
 
 .logo {
+  display: grid;
   width: 54px;
   height: 54px;
   margin: 0 auto 14px;
-  display: grid;
   place-items: center;
   border-radius: 16px;
   background: linear-gradient(135deg, #6D5DFC, #897DFF);
@@ -60,15 +65,15 @@ body {
 }
 
 .logo::before {
-  content: "";
   width: 22px;
   height: 22px;
+  content: "";
   border: 4px solid white;
   border-radius: 4px;
 }
 
 h1 {
-  font-size: 1.7rem;
+  font-size: clamp(1.4rem, 5vw, 1.7rem);
   letter-spacing: -0.03em;
 }
 
@@ -101,18 +106,18 @@ select {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 10px;
+  outline: none;
   background: #fafbfe;
   color: var(--text);
   font: inherit;
   font-size: 16px;
-  outline: 0;
 }
 
 textarea {
   display: block;
   min-height: 105px;
-  resize: vertical;
   padding: 14px 45px 14px 15px;
+  resize: vertical;
   line-height: 1.45;
 }
 
@@ -120,22 +125,29 @@ textarea:focus,
 input:focus,
 select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px #6D5DFC18;
   background: white;
+  box-shadow: 0 0 0 4px #6D5DFC18;
 }
 
 .clear {
   position: absolute;
   top: 9px;
   right: 9px;
+  display: flex;
   width: 34px;
   height: 34px;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 8px;
   background: transparent;
   color: #9296a5;
-  font-size: 22px;
   cursor: pointer;
+  font-size: 22px;
+}
+
+.clear:hover {
+  background: #00000010;
 }
 
 .customization {
@@ -172,6 +184,15 @@ select {
   padding: 0 11px;
 }
 
+input[type="range"] {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
 .hex-row {
   display: flex;
   gap: 8px;
@@ -198,8 +219,8 @@ select {
   width: 36px;
   height: 36px;
   border: 2px solid white;
-  outline: 1px solid #d9dbe4;
   border-radius: 50%;
+  outline: 1px solid #d9dbe4;
   cursor: pointer;
 }
 
@@ -221,17 +242,17 @@ select {
   border-radius: 10px;
   background: #fafbfe;
   color: var(--muted);
+  cursor: pointer;
   font: inherit;
   font-size: 0.76rem;
   font-weight: 650;
-  cursor: pointer;
 }
 
 .frame-btn.active,
 .social-btn.active {
   border-color: var(--primary);
-  color: var(--primary);
   background: #6D5DFC0D;
+  color: var(--primary);
   box-shadow: inset 0 0 0 1px var(--primary);
 }
 
@@ -250,22 +271,13 @@ select {
   font-weight: 800;
 }
 
-input[type="range"] {
-  height: auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  accent-color: var(--primary);
-  cursor: pointer;
-}
-
 .check {
   display: flex;
   align-items: center;
   gap: 9px;
+  cursor: pointer;
   font-size: 0.86rem;
   font-weight: 650;
-  cursor: pointer;
 }
 
 .check input {
@@ -278,21 +290,6 @@ input[type="range"] {
   margin-top: 18px;
   padding-top: 18px;
   border-top: 1px dashed var(--border);
-}
-
-.socials {
-  display: none;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.socials.visible {
-  display: grid;
-}
-
-.social-btn {
-  min-height: 48px;
 }
 
 .notice {
@@ -308,6 +305,31 @@ input[type="range"] {
 
 .notice.visible {
   display: block;
+}
+
+.socials {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.socials.visible {
+  display: grid;
+}
+
+.social-btn {
+  min-height: 62px;
+  padding: 7px 4px;
+  font-size: 0.72rem;
+}
+
+.social-btn img {
+  display: block;
+  width: 23px;
+  height: 23px;
+  margin: 0 auto 4px;
+  object-fit: contain;
 }
 
 .preview {
@@ -326,7 +348,6 @@ input[type="range"] {
   width: 100%;
   max-width: 100%;
   margin: auto;
-  padding: 0;
   overflow: hidden;
 }
 
@@ -356,29 +377,29 @@ input[type="range"] {
   flex: 1;
   min-height: 50px;
   border-radius: 12px;
+  cursor: pointer;
   font: inherit;
   font-weight: 750;
-  cursor: pointer;
 }
 
 .download {
   border: 0;
-  color: white;
   background: linear-gradient(135deg, #6D5DFC, #7B6CFF);
+  color: white;
   box-shadow: 0 8px 18px #6D5DFC38;
 }
 
 .share {
-  color: var(--primary);
   border: 1px solid var(--primary);
   background: #6D5DFC0D;
+  color: var(--primary);
   box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 .footer {
   margin-top: 20px;
-  text-align: center;
   color: #9a9daa;
+  text-align: center;
   font-size: 0.75rem;
 }
 
@@ -426,7 +447,7 @@ input[type="range"] {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #12131c;
+    --background: #12131c;
     --card: #1b1c29;
     --text: #f2f2f7;
     --muted: #9498a8;
@@ -462,7 +483,7 @@ input[type="range"] {
   </header>
 
   <div class="app-inner">
-    <div>
+    <div class="controls-column">
       <div class="label">
         <label for="qr-text">Texto ou Link:</label>
         <span id="counter" class="counter">0 caracteres</span>
@@ -486,7 +507,7 @@ input[type="range"] {
 
         <div class="grid">
           <div class="field">
-            <label class="field-label">Formato dos pixels</label>
+            <label class="field-label" for="style">Formato dos pixels</label>
 
             <select id="style">
               <option value="square">Quadrado</option>
@@ -498,7 +519,7 @@ input[type="range"] {
           </div>
 
           <div class="field">
-            <label class="field-label">Correção de erro</label>
+            <label class="field-label" for="ecc">Correção de erro</label>
 
             <select id="ecc">
               <option value="H">Alta — H</option>
@@ -510,7 +531,7 @@ input[type="range"] {
         </div>
 
         <div class="field">
-          <label class="field-label">Tamanho do QR Code</label>
+          <label class="field-label" for="size">Tamanho do QR Code</label>
 
           <select id="size">
             <option value="125">125 px</option>
@@ -526,12 +547,12 @@ input[type="range"] {
 
         <div class="field">
           <label class="field-label">Cores predefinidas</label>
-          <div class="swatches" id="swatches"></div>
+          <div id="swatches" class="swatches"></div>
         </div>
 
         <div class="grid">
           <div class="field">
-            <label class="field-label">Cor do QR — HEX</label>
+            <label class="field-label" for="fg">Cor do QR — HEX</label>
 
             <div class="hex-row">
               <input id="fg-picker" class="color-picker" type="color" value="#000000">
@@ -540,7 +561,7 @@ input[type="range"] {
           </div>
 
           <div class="field">
-            <label class="field-label">Cor do fundo — HEX</label>
+            <label class="field-label" for="bg">Cor do fundo — HEX</label>
 
             <div class="hex-row">
               <input id="bg-picker" class="color-picker" type="color" value="#FFFFFF">
@@ -563,7 +584,7 @@ input[type="range"] {
         </div>
 
         <div id="thickness" class="field thickness">
-          <label class="field-label">
+          <label class="field-label" for="thickness-input">
             Espessura do frame —
             <span id="thickness-value" class="thickness-value">56</span> px
           </label>
@@ -581,12 +602,12 @@ input[type="range"] {
         <div id="frame-options" class="frame-options">
           <div class="grid">
             <div class="field">
-              <label class="field-label">Texto do frame</label>
+              <label class="field-label" for="frame-text">Texto do frame</label>
               <input id="frame-text" value="Acesse aqui" maxlength="70">
             </div>
 
             <div class="field">
-              <label class="field-label">Cor do frame</label>
+              <label class="field-label" for="frame-color">Cor do frame</label>
 
               <div class="hex-row">
                 <input id="frame-picker" class="color-picker" type="color" value="#6D5DFC">
@@ -611,11 +632,7 @@ input[type="range"] {
             Correção de erro elevada para H automaticamente para garantir a leitura com o logo.
           </div>
 
-          <div id="socials" class="socials">
-            <button class="social-btn active" data-social="whatsapp">WhatsApp</button>
-            <button class="social-btn" data-social="instagram">Instagram</button>
-            <button class="social-btn" data-social="youtube">YouTube</button>
-          </div>
+          <div id="socials" class="socials"></div>
         </div>
       </section>
     </div>
@@ -637,7 +654,7 @@ input[type="range"] {
   </div>
 
   <footer class="footer">
-    Tudo é processado localmente no navegador.
+    Tudo é processado localmente no navegador. Ícones via Simple Icons.
   </footer>
 </main>
 
@@ -658,8 +675,8 @@ let fg = "#000000";
 let bg = "#FFFFFF";
 let frame = "none";
 let thick = getDefaultFrameThickness();
-let social = "whatsapp";
-let timer;
+let selectedSocial = "whatsapp";
+let timer = null;
 
 const colors = [
   "#000000",
@@ -674,6 +691,67 @@ const colors = [
   "#0891B2"
 ];
 
+/*
+  Os SVGs são carregados pelo CDN Simple Icons.
+  Isso restaura ícones reais em vez de caracteres de texto.
+*/
+const SOCIAL_NETWORKS = {
+  whatsapp: {
+    label: "WhatsApp",
+    slug: "whatsapp",
+    color: "#25D366"
+  },
+  instagram: {
+    label: "Instagram",
+    slug: "instagram",
+    color: "#E4405F"
+  },
+  youtube: {
+    label: "YouTube",
+    slug: "youtube",
+    color: "#FF0000"
+  },
+  facebook: {
+    label: "Facebook",
+    slug: "facebook",
+    color: "#1877F2"
+  },
+  x: {
+    label: "X",
+    slug: "x",
+    color: "#000000"
+  },
+  linkedin: {
+    label: "LinkedIn",
+    slug: "linkedin",
+    color: "#0A66C2"
+  },
+  telegram: {
+    label: "Telegram",
+    slug: "telegram",
+    color: "#26A5E4"
+  },
+  tiktok: {
+    label: "TikTok",
+    slug: "tiktok",
+    color: "#000000"
+  },
+  discord: {
+    label: "Discord",
+    slug: "discord",
+    color: "#5865F2"
+  },
+  threads: {
+    label: "Threads",
+    slug: "threads",
+    color: "#000000"
+  }
+};
+
+function getSocialIconUrl(network) {
+  return `https://cdn.simpleicons.org/${network.slug}/${network.color.replace("#", "")}`;
+}
+
 function getMargin() {
   return Math.max(4, Math.round(size * 0.03));
 }
@@ -685,15 +763,6 @@ function getDefaultFrameThickness(qrSize = size) {
 function getTextFont(fontSize) {
   return `700 ${Math.round(fontSize)}px ${FONT_FAMILY}`;
 }
-
-$("swatches").innerHTML = colors.map((color, index) => `
-  <button
-    class="swatch ${index ? "" : "active"}"
-    data-color="${color}"
-    style="background:${color}"
-    aria-label="${color}"
-  ></button>
-`).join("");
 
 function isHex(value) {
   return /^#[0-9a-f]{6}$/i.test(value);
@@ -710,6 +779,37 @@ function roundedRect(context, x, y, width, height, radius) {
 function schedulePreview() {
   clearTimeout(timer);
   timer = setTimeout(updatePreview, 1000);
+}
+
+function buildSwatches() {
+  $("swatches").innerHTML = colors.map((color, index) => `
+    <button
+      class="swatch ${index === 0 ? "active" : ""}"
+      data-color="${color}"
+      style="background:${color}"
+      aria-label="${color}"
+      type="button"
+    ></button>
+  `).join("");
+}
+
+function buildSocialButtons() {
+  $("socials").innerHTML = Object.entries(SOCIAL_NETWORKS).map(([key, network]) => `
+    <button
+      class="social-btn ${key === selectedSocial ? "active" : ""}"
+      data-social="${key}"
+      type="button"
+      aria-label="${network.label}"
+    >
+      <img
+        src="${getSocialIconUrl(network)}"
+        alt=""
+        width="23"
+        height="23"
+      >
+      ${network.label}
+    </button>
+  `).join("");
 }
 
 function drawModule(context, x, y, moduleSize, type) {
@@ -810,7 +910,7 @@ function drawFinder(context, x, y, moduleSize, type) {
 function generateBaseQR() {
   const qr = qrcode(0, $("ecc").value);
   const text = $("qr-text").value.trim();
-  const type = $("style").value;
+  const style = $("style").value;
 
   qr.addData(text);
   qr.make();
@@ -821,7 +921,6 @@ function generateBaseQR() {
   const moduleSize = usableSize / modules;
 
   const qrCanvas = document.createElement("canvas");
-
   qrCanvas.width = size;
   qrCanvas.height = size;
 
@@ -857,7 +956,7 @@ function generateBaseQR() {
         margin + column * moduleSize,
         margin + row * moduleSize,
         moduleSize,
-        type
+        style
       );
     }
   }
@@ -868,7 +967,7 @@ function generateBaseQR() {
       margin + column * moduleSize,
       margin + row * moduleSize,
       moduleSize,
-      type
+      style
     );
   });
 
@@ -938,47 +1037,74 @@ function getLayout() {
   };
 }
 
-function drawSocialIcon(context) {
+async function fetchSvgAsImage(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Não foi possível carregar o ícone.");
+  }
+
+  const svgText = await response.text();
+  const blob = new Blob([svgText], { type: "image/svg+xml" });
+  const objectUrl = URL.createObjectURL(blob);
+
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Não foi possível preparar o ícone."));
+    };
+
+    image.src = objectUrl;
+  });
+}
+
+async function drawSocialIcon(context) {
   if (!$("icon-enabled").checked) return;
 
-  const networkColors = {
-    whatsapp: "#25D366",
-    instagram: "#D62976",
-    youtube: "#FF0000"
-  };
+  const network = SOCIAL_NETWORKS[selectedSocial];
 
-  const iconSize = size * 0.20;
+  if (!network) return;
+
+  const iconSize = Math.round(size * 0.20);
+  const badgePadding = Math.max(6, Math.round(size * 0.012));
   const center = size / 2;
 
   context.fillStyle = "#FFFFFF";
 
   roundedRect(
     context,
-    center - iconSize / 2 - 6,
-    center - iconSize / 2 - 6,
-    iconSize + 12,
-    iconSize + 12,
-    14
+    Math.round(center - iconSize / 2 - badgePadding),
+    Math.round(center - iconSize / 2 - badgePadding),
+    iconSize + badgePadding * 2,
+    iconSize + badgePadding * 2,
+    Math.round(size * 0.028)
   );
 
   context.fill();
 
-  context.fillStyle = networkColors[social];
-  context.beginPath();
-  context.arc(center, center, iconSize * 0.47, 0, Math.PI * 2);
-  context.fill();
+  try {
+    const image = await fetchSvgAsImage(getSocialIconUrl(network));
 
-  context.fillStyle = "#FFFFFF";
-  context.font = `700 ${Math.round(iconSize * 0.50)}px ${FONT_FAMILY}`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-
-  const icon =
-    social === "youtube" ? "▶" :
-    social === "instagram" ? "◎" :
-    "☎";
-
-  context.fillText(icon, Math.round(center), Math.round(center));
+    context.drawImage(
+      image,
+      Math.round(center - iconSize / 2),
+      Math.round(center - iconSize / 2),
+      iconSize,
+      iconSize
+    );
+  } catch {
+    /*
+      Se o CDN estiver temporariamente indisponível,
+      o QR continua funcional; apenas o logotipo não é desenhado.
+    */
+  }
 }
 
 function fitText(context, text, maxWidth, initialSize) {
@@ -1000,11 +1126,19 @@ async function render() {
   const layout = getLayout();
   const qrCanvas = generateBaseQR();
 
-  drawSocialIcon(qrCanvas.getContext("2d"));
+  await drawSocialIcon(qrCanvas.getContext("2d"));
 
+  /*
+    O tamanho interno do canvas é exatamente o tamanho
+    que será exportado em PNG. Não usa devicePixelRatio.
+  */
   canvas.width = Math.round(layout.width);
   canvas.height = Math.round(layout.height);
 
+  /*
+    A prévia diminui para caber na coluna, mas preserva
+    integralmente a proporção do PNG exportado.
+  */
   previewContainer.style.width = `min(100%, ${layout.width}px)`;
   previewContainer.style.aspectRatio = `${layout.width} / ${layout.height}`;
 
@@ -1012,7 +1146,7 @@ async function render() {
   ctx.textRendering = "geometricPrecision";
 
   const frameColor = isHex($("frame-color").value)
-    ? $("frame-color").value
+    ? $("frame-color").value.toUpperCase()
     : "#6D5DFC";
 
   const frameText = $("frame-text").value.trim() || "Acesse aqui";
@@ -1035,14 +1169,8 @@ async function render() {
     ctx.fillStyle = "#FFFFFF";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-
     ctx.font = getTextFont(
-      fitText(
-        ctx,
-        frameText,
-        layout.width - 50,
-        thick * 0.42
-      )
+      fitText(ctx, frameText, layout.width - 50, thick * 0.42)
     );
 
     ctx.fillText(
@@ -1054,13 +1182,7 @@ async function render() {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, layout.width, layout.height);
 
-    ctx.drawImage(
-      qrCanvas,
-      layout.qrX,
-      layout.qrY,
-      size,
-      size
-    );
+    ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, size, size);
 
     const [x, y, width, height, direction, rotation] = layout.bar;
 
@@ -1088,24 +1210,15 @@ async function render() {
       ctx.rotate(Math.PI / 2 * rotation);
 
       ctx.font = getTextFont(
-        fitText(
-          ctx,
-          frameText,
-          height - 40,
-          width * 0.42
-        )
+        fitText(ctx, frameText, height - 40, width * 0.42)
       );
 
       ctx.fillText(frameText, 0, 0);
+
       ctx.restore();
     } else {
       ctx.font = getTextFont(
-        fitText(
-          ctx,
-          frameText,
-          width - 40,
-          height * 0.42
-        )
+        fitText(ctx, frameText, width - 40, height * 0.42)
       );
 
       ctx.fillText(
@@ -1116,10 +1229,8 @@ async function render() {
     }
   }
 
-  const margin = getMargin();
-
   $("info").textContent =
-    `PNG • ${canvas.width} × ${canvas.height} px • margem branca de ${margin} px`;
+    `PNG • ${canvas.width} × ${canvas.height} px • margem branca de ${getMargin()} px`;
 }
 
 async function updatePreview() {
@@ -1134,27 +1245,62 @@ async function updatePreview() {
   }
 }
 
-$("qr-text").addEventListener("input", () => {
-  const total = $("qr-text").value.length;
+function updateCounter() {
+  const amount = $("qr-text").value.length;
 
   $("counter").textContent =
-    `${total} ${total === 1 ? "caractere" : "caracteres"}`;
+    `${amount} ${amount === 1 ? "caractere" : "caracteres"}`;
+}
 
+function bindColor(textId, pickerId, callback) {
+  const update = value => {
+    if (!isHex(value)) return;
+
+    const normalized = value.toUpperCase();
+
+    callback(normalized);
+
+    $(textId).value = normalized;
+    $(pickerId).value = normalized;
+
+    schedulePreview();
+  };
+
+  $(textId).addEventListener("input", event => {
+    update(event.target.value);
+  });
+
+  $(pickerId).addEventListener("input", event => {
+    update(event.target.value);
+  });
+}
+
+buildSwatches();
+buildSocialButtons();
+
+$("qr-text").addEventListener("input", () => {
+  updateCounter();
   schedulePreview();
+});
+
+$("qr-text").addEventListener("blur", () => {
+  clearTimeout(timer);
+  updatePreview();
 });
 
 $("clear").addEventListener("click", () => {
   $("qr-text").value = "";
-  $("counter").textContent = "0 caracteres";
+  updateCounter();
 
+  clearTimeout(timer);
   updatePreview();
+
   $("qr-text").focus();
 });
 
 $("size").addEventListener("change", event => {
   size = Number(event.target.value);
 
-  /* Ajusta a espessura padrão de acordo com o novo tamanho. */
   thick = getDefaultFrameThickness(size);
 
   $("thickness-input").value = thick;
@@ -1168,7 +1314,6 @@ $("ecc").addEventListener("change", schedulePreview);
 
 $("thickness-input").addEventListener("input", event => {
   thick = Number(event.target.value);
-
   $("thickness-value").textContent = thick;
 
   schedulePreview();
@@ -1205,7 +1350,7 @@ $("swatches").addEventListener("click", event => {
 
   event.target.classList.add("active");
 
-  fg = event.target.dataset.color;
+  fg = event.target.dataset.color.toUpperCase();
 
   $("fg").value = fg;
   $("fg-picker").value = fg;
@@ -1213,28 +1358,19 @@ $("swatches").addEventListener("click", event => {
   schedulePreview();
 });
 
-function bindColor(textId, pickerId, callback) {
-  const update = value => {
-    if (!isHex(value)) return;
+$("socials").addEventListener("click", event => {
+  const button = event.target.closest("[data-social]");
 
-    const normalized = value.toUpperCase();
+  if (!button) return;
 
-    callback(normalized);
+  selectedSocial = button.dataset.social;
 
-    $(textId).value = normalized;
-    $(pickerId).value = normalized;
-
-    schedulePreview();
-  };
-
-  $(textId).addEventListener("input", event => {
-    update(event.target.value);
+  document.querySelectorAll(".social-btn").forEach(item => {
+    item.classList.toggle("active", item === button);
   });
 
-  $(pickerId).addEventListener("input", event => {
-    update(event.target.value);
-  });
-}
+  schedulePreview();
+});
 
 bindColor("fg", "fg-picker", value => {
   fg = value;
@@ -1247,57 +1383,61 @@ bindColor("bg", "bg-picker", value => {
 bindColor("frame-color", "frame-picker", () => {});
 
 $("icon-enabled").addEventListener("change", event => {
-  $("socials").classList.toggle("visible", event.target.checked);
-  $("notice").classList.toggle("visible", event.target.checked);
+  const enabled = event.target.checked;
 
-  if (event.target.checked) {
+  $("socials").classList.toggle("visible", enabled);
+  $("notice").classList.toggle("visible", enabled);
+
+  if (enabled) {
     $("ecc").value = "H";
   }
 
   schedulePreview();
 });
 
-$("socials").addEventListener("click", event => {
-  if (!event.target.dataset.social) return;
-
-  social = event.target.dataset.social;
-
-  document.querySelectorAll(".social-btn").forEach(button => {
-    button.classList.toggle("active", button === event.target);
-  });
-
-  schedulePreview();
-});
-
 $("download").addEventListener("click", () => {
+  if (!canvas.width) return;
+
   const link = document.createElement("a");
 
   link.download = `qrcode-${canvas.width}x${canvas.height}.png`;
   link.href = canvas.toDataURL("image/png");
 
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 });
 
 $("share").addEventListener("click", async () => {
-  const blob = await new Promise(resolve => {
-    canvas.toBlob(resolve, "image/png");
-  });
+  if (!canvas.width) return;
 
-  const file = new File(
-    [blob],
-    `qrcode-${canvas.width}x${canvas.height}.png`,
-    { type: "image/png" }
-  );
-
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    navigator.share({
-      files: [file],
-      title: "QR Code"
+  try {
+    const blob = await new Promise(resolve => {
+      canvas.toBlob(resolve, "image/png");
     });
-  } else {
-    alert("Compartilhamento não suportado neste navegador. Use Baixar PNG.");
+
+    const file = new File(
+      [blob],
+      `qrcode-${canvas.width}x${canvas.height}.png`,
+      { type: "image/png" }
+    );
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: "QR Code"
+      });
+    } else {
+      alert("Compartilhamento não suportado neste navegador. Use Baixar PNG.");
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      alert("Não foi possível compartilhar. Tente baixar o PNG.");
+    }
   }
 });
+
+updateCounter();
 </script>
 </body>
 </html>
