@@ -167,14 +167,20 @@ input[type="range"] {
 .action-button:active { transform: scale(0.97); }
 
 .download-button { display: none; color: white; background: linear-gradient(135deg, #6D5DFC, #7B6CFF); box-shadow: 0 8px 18px #6D5DFC38; }
-.share-button { display: none; color: white; background: #171827; }
+.share-button {
+  display: none;
+  color: var(--primary);
+  background: #6D5DFC0D;
+  border: 1px solid var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
 
 .preview { display: none; margin-top: 23px; padding-top: 23px; border-top: 1px solid var(--border); text-align: center; }
 .preview.visible { display: block; animation: fadeIn .35s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 .preview-container { overflow: auto; padding: 5px; }
-#qr-canvas { display: block; width: 100%; max-width: 500px; height: auto; margin: auto; }
+#qr-canvas { display: block; width: 100%; max-width: 1000px; height: auto; margin: auto; }
 .preview-info { margin-top: 11px; color: var(--muted); font-size: 0.8rem; }
 
 .footer { margin-top: 20px; text-align: center; color: #9a9daa; font-size: 0.75rem; }
@@ -207,7 +213,7 @@ input[type="range"] {
   <div class="app-inner">
     <div class="controls-column">
       <div class="label">
-        <label for="qr-text">Texto ou link</label>
+        <label for="qr-text">Texto ou Link:</label>
         <span id="counter" class="counter">0 caracteres</span>
       </div>
 
@@ -237,6 +243,22 @@ input[type="range"] {
               <option value="Q">Boa — Q</option>
               <option value="M">Média — M</option>
               <option value="L">Baixa — L</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label class="field-label">Tamanho do QR Code</label>
+            <select id="qr-size" aria-label="Tamanho do QR Code">
+              <option value="125">125 px</option>
+              <option value="250">250 px</option>
+              <option value="375">375 px</option>
+              <option value="500" selected>500 px</option>
+              <option value="625">625 px</option>
+              <option value="750">750 px</option>
+              <option value="875">875 px</option>
+              <option value="1000">1000 px</option>
             </select>
           </div>
         </div>
@@ -353,7 +375,6 @@ input[type="range"] {
 </main>
 
 <script>
-const QR_SIZE = 500;
 const QR_MARGIN = 15;
 const GAP = 10;
 const DPR = Math.min(window.devicePixelRatio || 1, 3);
@@ -366,6 +387,7 @@ const preview = document.getElementById("preview");
 const downloadButton = document.getElementById("download-button");
 const shareButton = document.getElementById("share-button");
 
+let qrSize = 500;
 let qrColor = "#000000";
 let backgroundColor = "#FFFFFF";
 let currentFrame = "none";
@@ -436,10 +458,10 @@ function generateBaseQR() {
   qr.addData(text);
   qr.make();
   const modules = qr.getModuleCount();
-  const usableSize = QR_SIZE - (QR_MARGIN * 2);
+  const usableSize = qrSize - (QR_MARGIN * 2);
   const moduleSize = (usableSize / modules) * DPR;
   const margin = QR_MARGIN * DPR;
-  const totalSize = QR_SIZE * DPR;
+  const totalSize = qrSize * DPR;
   const qrCanvas = document.createElement("canvas");
   qrCanvas.width = totalSize;
   qrCanvas.height = totalSize;
@@ -566,22 +588,22 @@ function computeLayout(position) {
   const bottomH = thick + 16;
   switch (position) {
     case "top":
-      return { width: QR_SIZE, height: QR_SIZE + GAP + thick, qrX: 0, qrY: thick + GAP,
-        bar: { x: 0, y: 0, w: QR_SIZE, h: thick }, orientation: "h" };
+      return { width: qrSize, height: qrSize + GAP + thick, qrX: 0, qrY: thick + GAP,
+        bar: { x: 0, y: 0, w: qrSize, h: thick }, orientation: "h" };
     case "bottom":
-      return { width: QR_SIZE, height: QR_SIZE + GAP + thick, qrX: 0, qrY: 0,
-        bar: { x: 0, y: QR_SIZE + GAP, w: QR_SIZE, h: thick }, orientation: "h" };
+      return { width: qrSize, height: qrSize + GAP + thick, qrX: 0, qrY: 0,
+        bar: { x: 0, y: qrSize + GAP, w: qrSize, h: thick }, orientation: "h" };
     case "left":
-      return { width: QR_SIZE + GAP + thick, height: QR_SIZE, qrX: thick + GAP, qrY: 0,
-        bar: { x: 0, y: 0, w: thick, h: QR_SIZE }, orientation: "v", rotate: -1 };
+      return { width: qrSize + GAP + thick, height: qrSize, qrX: thick + GAP, qrY: 0,
+        bar: { x: 0, y: 0, w: thick, h: qrSize }, orientation: "v", rotate: -1 };
     case "right":
-      return { width: QR_SIZE + GAP + thick, height: QR_SIZE, qrX: 0, qrY: 0,
-        bar: { x: QR_SIZE + GAP, y: 0, w: thick, h: QR_SIZE }, orientation: "v", rotate: 1 };
+      return { width: qrSize + GAP + thick, height: qrSize, qrX: 0, qrY: 0,
+        bar: { x: qrSize + GAP, y: 0, w: thick, h: qrSize }, orientation: "v", rotate: 1 };
     case "full":
-      return { width: QR_SIZE + ring * 2, height: ring + QR_SIZE + bottomH,
+      return { width: qrSize + ring * 2, height: ring + qrSize + bottomH,
         qrX: ring, qrY: ring, full: true, bottomH: bottomH };
     default:
-      return { width: QR_SIZE, height: QR_SIZE, qrX: 0, qrY: 0 };
+      return { width: qrSize, height: qrSize, qrX: 0, qrY: 0 };
   }
 }
 
@@ -600,7 +622,7 @@ function drawIconOverlay(qrCtx) {
   const image = new Image();
   return new Promise(resolve => {
     image.onload = function () {
-      const totalSize = QR_SIZE * DPR;
+      const totalSize = qrSize * DPR;
       const badgeSize = totalSize * 0.20;
       const cx = totalSize / 2, cy = totalSize / 2;
       qrCtx.save();
@@ -641,7 +663,7 @@ async function render() {
   if (currentFrame === "none") {
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, layout.width, layout.height);
-    ctx.drawImage(qrCanvas, 0, 0, QR_SIZE, QR_SIZE);
+    ctx.drawImage(qrCanvas, 0, 0, qrSize, qrSize);
     document.getElementById("preview-info").textContent = `PNG • ${canvas.width} × ${canvas.height} px • margem branca de 15 px`;
     return;
   }
@@ -654,12 +676,12 @@ async function render() {
     } else {
       ctx.fillRect(0, 0, layout.width, layout.height);
     }
-    ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, QR_SIZE, QR_SIZE);
+    ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, qrSize, qrSize);
     ctx.fillStyle = "#FFFFFF";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     const centerX = layout.width / 2;
-    const centerY = layout.qrY + QR_SIZE + layout.bottomH / 2;
+    const centerY = layout.qrY + qrSize + layout.bottomH / 2;
     const fontSize = fitText(ctx, frameText, layout.width - 50, Math.round(frameThickness * 0.42));
     ctx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
     ctx.fillText(frameText, centerX, centerY);
@@ -670,7 +692,7 @@ async function render() {
 
   ctx.fillStyle = backgroundColor;
   ctx.fillRect(0, 0, layout.width, layout.height);
-  ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, QR_SIZE, QR_SIZE);
+  ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, qrSize, qrSize);
 
   const bar = layout.bar;
   ctx.fillStyle = frameColor;
@@ -700,7 +722,7 @@ async function render() {
   }
 
   document.getElementById("preview-info").textContent =
-    `PNG • ${canvas.width} × ${canvas.height} px • QR ${QR_SIZE * DPR} × ${QR_SIZE * DPR}`;
+    `PNG • ${canvas.width} × ${canvas.height} px • QR ${qrSize * DPR} × ${qrSize * DPR}`;
 }
 
 function downloadQRCode() {
@@ -745,7 +767,7 @@ async function updatePreview() {
 
 function schedulePreview() {
   clearTimeout(renderTimeout);
-  renderTimeout = setTimeout(updatePreview, 2000);
+  renderTimeout = setTimeout(updatePreview, 1000);
 }
 
 input.addEventListener("input", function () {
@@ -805,6 +827,11 @@ document.getElementById("bg-color").addEventListener("input", function () {
 document.getElementById("bg-color-picker").addEventListener("input", function () {
   backgroundColor = this.value.toUpperCase();
   document.getElementById("bg-color").value = backgroundColor;
+  schedulePreview();
+});
+
+document.getElementById("qr-size").addEventListener("change", function () {
+  qrSize = parseInt(this.value, 10);
   schedulePreview();
 });
 
