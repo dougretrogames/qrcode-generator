@@ -43,8 +43,8 @@ body {
   width: min(100%, 700px);
   margin: auto;
   padding: 28px;
-  background: var(--card);
   border-radius: 20px;
+  background: var(--card);
   box-shadow: 0 18px 55px rgba(28, 30, 52, 0.1);
 }
 
@@ -319,7 +319,7 @@ input[type="range"] {
 }
 
 .social-btn {
-  min-height: 62px;
+  min-height: 64px;
   padding: 7px 4px;
   font-size: 0.72rem;
 }
@@ -483,7 +483,7 @@ input[type="range"] {
   </header>
 
   <div class="app-inner">
-    <div class="controls-column">
+    <div>
       <div class="label">
         <label for="qr-text">Texto ou Link:</label>
         <span id="counter" class="counter">0 caracteres</span>
@@ -574,12 +574,12 @@ input[type="range"] {
           <label class="field-label">Posição do frame</label>
 
           <div id="frames" class="frames">
-            <button class="frame-btn active" data-frame="none">Nenhum</button>
-            <button class="frame-btn" data-frame="top">Superior</button>
-            <button class="frame-btn" data-frame="bottom">Inferior</button>
-            <button class="frame-btn" data-frame="left">Lateral esq.</button>
-            <button class="frame-btn" data-frame="right">Lateral dir.</button>
-            <button class="frame-btn" data-frame="full">Completo</button>
+            <button class="frame-btn active" data-frame="none" type="button">Nenhum</button>
+            <button class="frame-btn" data-frame="top" type="button">Superior</button>
+            <button class="frame-btn" data-frame="bottom" type="button">Inferior</button>
+            <button class="frame-btn" data-frame="left" type="button">Lateral esq.</button>
+            <button class="frame-btn" data-frame="right" type="button">Lateral dir.</button>
+            <button class="frame-btn" data-frame="full" type="button">Completo</button>
           </div>
         </div>
 
@@ -647,8 +647,8 @@ input[type="range"] {
       </section>
 
       <div id="actions" class="actions">
-        <button id="download" class="action download">Baixar PNG</button>
-        <button id="share" class="action share">Compartilhar</button>
+        <button id="download" class="action download" type="button">Baixar PNG</button>
+        <button id="share" class="action share" type="button">Compartilhar</button>
       </div>
     </div>
   </div>
@@ -691,66 +691,27 @@ const colors = [
   "#0891B2"
 ];
 
-/*
-  Os SVGs são carregados pelo CDN Simple Icons.
-  Isso restaura ícones reais em vez de caracteres de texto.
-*/
-const SOCIAL_NETWORKS = {
-  whatsapp: {
-    label: "WhatsApp",
-    slug: "whatsapp",
-    color: "#25D366"
-  },
-  instagram: {
-    label: "Instagram",
-    slug: "instagram",
-    color: "#E4405F"
-  },
-  youtube: {
-    label: "YouTube",
-    slug: "youtube",
-    color: "#FF0000"
-  },
-  facebook: {
-    label: "Facebook",
-    slug: "facebook",
-    color: "#1877F2"
-  },
-  x: {
-    label: "X",
-    slug: "x",
-    color: "#000000"
-  },
-  linkedin: {
-    label: "LinkedIn",
-    slug: "linkedin",
-    color: "#0A66C2"
-  },
-  telegram: {
-    label: "Telegram",
-    slug: "telegram",
-    color: "#26A5E4"
-  },
-  tiktok: {
-    label: "TikTok",
-    slug: "tiktok",
-    color: "#000000"
-  },
-  discord: {
-    label: "Discord",
-    slug: "discord",
-    color: "#5865F2"
-  },
-  threads: {
-    label: "Threads",
-    slug: "threads",
-    color: "#000000"
-  }
-};
+const LINKEDIN_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path
+    fill="#0A66C2"
+    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556z"
+  />
+</svg>
+`;
 
-function getSocialIconUrl(network) {
-  return `https://cdn.simpleicons.org/${network.slug}/${network.color.replace("#", "")}`;
-}
+const SOCIAL_NETWORKS = {
+  whatsapp: { label: "WhatsApp", slug: "whatsapp", color: "#25D366" },
+  instagram: { label: "Instagram", slug: "instagram", color: "#E4405F" },
+  youtube: { label: "YouTube", slug: "youtube", color: "#FF0000" },
+  facebook: { label: "Facebook", slug: "facebook", color: "#1877F2" },
+  x: { label: "X", slug: "x", color: "#000000" },
+  linkedin: { label: "LinkedIn", slug: "linkedin", color: "#0A66C2" },
+  telegram: { label: "Telegram", slug: "telegram", color: "#26A5E4" },
+  tiktok: { label: "TikTok", slug: "tiktok", color: "#000000" },
+  discord: { label: "Discord", slug: "discord", color: "#5865F2" },
+  threads: { label: "Threads", slug: "threads", color: "#000000" }
+};
 
 function getMargin() {
   return Math.max(4, Math.round(size * 0.03));
@@ -779,6 +740,14 @@ function roundedRect(context, x, y, width, height, radius) {
 function schedulePreview() {
   clearTimeout(timer);
   timer = setTimeout(updatePreview, 1000);
+}
+
+function getSocialIconUrl(network) {
+  if (network.slug === "linkedin") {
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(LINKEDIN_SVG)}`;
+  }
+
+  return `https://cdn.simpleicons.org/${network.slug}/${network.color.replace("#", "")}`;
 }
 
 function buildSwatches() {
@@ -921,6 +890,7 @@ function generateBaseQR() {
   const moduleSize = usableSize / modules;
 
   const qrCanvas = document.createElement("canvas");
+
   qrCanvas.width = size;
   qrCanvas.height = size;
 
@@ -1037,15 +1007,25 @@ function getLayout() {
   };
 }
 
-async function fetchSvgAsImage(url) {
-  const response = await fetch(url);
+async function fetchSvgAsImage(network) {
+  let svgText;
 
-  if (!response.ok) {
-    throw new Error("Não foi possível carregar o ícone.");
+  if (network.slug === "linkedin") {
+    svgText = LINKEDIN_SVG;
+  } else {
+    const response = await fetch(getSocialIconUrl(network));
+
+    if (!response.ok) {
+      throw new Error("Não foi possível carregar o ícone.");
+    }
+
+    svgText = await response.text();
   }
 
-  const svgText = await response.text();
-  const blob = new Blob([svgText], { type: "image/svg+xml" });
+  const blob = new Blob([svgText], {
+    type: "image/svg+xml"
+  });
+
   const objectUrl = URL.createObjectURL(blob);
 
   return new Promise((resolve, reject) => {
@@ -1065,6 +1045,44 @@ async function fetchSvgAsImage(url) {
   });
 }
 
+function drawIconFrameShape(context, x, y, width, height, style, layer) {
+  const centerX = x + width / 2;
+  const centerY = y + height / 2;
+
+  if (style === "circle" || style === "dot") {
+    context.beginPath();
+    context.arc(
+      centerX,
+      centerY,
+      Math.min(width, height) / 2,
+      0,
+      Math.PI * 2
+    );
+    context.closePath();
+    return;
+  }
+
+  if (style === "rounded") {
+    const radius = layer === "outer"
+      ? width * 0.26
+      : width * 0.22;
+
+    roundedRect(context, x, y, width, height, radius);
+    return;
+  }
+
+  if (style === "soft") {
+    const radius = layer === "outer"
+      ? width * 0.14
+      : width * 0.11;
+
+    roundedRect(context, x, y, width, height, radius);
+    return;
+  }
+
+  roundedRect(context, x, y, width, height, 0);
+}
+
 async function drawSocialIcon(context) {
   if (!$("icon-enabled").checked) return;
 
@@ -1072,25 +1090,64 @@ async function drawSocialIcon(context) {
 
   if (!network) return;
 
+  const pixelStyle = $("style").value;
+
   const iconSize = Math.round(size * 0.20);
-  const badgePadding = Math.max(6, Math.round(size * 0.012));
+  const whiteBorder = 2;
+  const blackBorder = 2;
+  const contentPadding = Math.max(6, Math.round(size * 0.012));
+
+  const totalPadding = whiteBorder + blackBorder + contentPadding;
+  const outerSize = iconSize + totalPadding * 2;
+
   const center = size / 2;
+  const outerX = Math.round(center - outerSize / 2);
+  const outerY = Math.round(center - outerSize / 2);
 
   context.fillStyle = "#FFFFFF";
 
-  roundedRect(
+  drawIconFrameShape(
     context,
-    Math.round(center - iconSize / 2 - badgePadding),
-    Math.round(center - iconSize / 2 - badgePadding),
-    iconSize + badgePadding * 2,
-    iconSize + badgePadding * 2,
-    Math.round(size * 0.028)
+    outerX,
+    outerY,
+    outerSize,
+    outerSize,
+    pixelStyle,
+    "outer"
+  );
+
+  context.fill();
+
+  context.fillStyle = "#000000";
+
+  drawIconFrameShape(
+    context,
+    outerX + whiteBorder,
+    outerY + whiteBorder,
+    outerSize - whiteBorder * 2,
+    outerSize - whiteBorder * 2,
+    pixelStyle,
+    "inner"
+  );
+
+  context.fill();
+
+  context.fillStyle = "#FFFFFF";
+
+  drawIconFrameShape(
+    context,
+    outerX + whiteBorder + blackBorder,
+    outerY + whiteBorder + blackBorder,
+    outerSize - (whiteBorder + blackBorder) * 2,
+    outerSize - (whiteBorder + blackBorder) * 2,
+    pixelStyle,
+    "inner"
   );
 
   context.fill();
 
   try {
-    const image = await fetchSvgAsImage(getSocialIconUrl(network));
+    const image = await fetchSvgAsImage(network);
 
     context.drawImage(
       image,
@@ -1100,10 +1157,7 @@ async function drawSocialIcon(context) {
       iconSize
     );
   } catch {
-    /*
-      Se o CDN estiver temporariamente indisponível,
-      o QR continua funcional; apenas o logotipo não é desenhado.
-    */
+    /* Mantém o QR funcional se o CDN estiver indisponível. */
   }
 }
 
@@ -1128,17 +1182,9 @@ async function render() {
 
   await drawSocialIcon(qrCanvas.getContext("2d"));
 
-  /*
-    O tamanho interno do canvas é exatamente o tamanho
-    que será exportado em PNG. Não usa devicePixelRatio.
-  */
   canvas.width = Math.round(layout.width);
   canvas.height = Math.round(layout.height);
 
-  /*
-    A prévia diminui para caber na coluna, mas preserva
-    integralmente a proporção do PNG exportado.
-  */
   previewContainer.style.width = `min(100%, ${layout.width}px)`;
   previewContainer.style.aspectRatio = `${layout.width} / ${layout.height}`;
 
@@ -1169,6 +1215,7 @@ async function render() {
     ctx.fillStyle = "#FFFFFF";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+
     ctx.font = getTextFont(
       fitText(ctx, frameText, layout.width - 50, thick * 0.42)
     );
@@ -1237,7 +1284,6 @@ async function updatePreview() {
   if ($("qr-text").value.trim()) {
     preview.classList.add("visible");
     actions.classList.add("visible");
-
     await render();
   } else {
     preview.classList.remove("visible");
