@@ -144,6 +144,12 @@ input, select {
 .frame-options { display: none; margin-top: 5px; }
 .icon-options { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--border); }
 
+.ecc-notice {
+  display: none; margin-top: 10px; padding: 9px 12px; border-radius: 9px;
+  background: #6D5DFC12; color: var(--primary); font-size: 0.78rem; font-weight: 650;
+}
+.ecc-notice.visible { display: block; }
+
 .actions { display: flex; gap: 10px; margin-top: 18px; position: sticky; bottom: max(10px, env(safe-area-inset-bottom)); }
 .action-button {
   flex: 1; min-height: 50px; border: none; border-radius: 12px; font: inherit; font-weight: 750; cursor: pointer;
@@ -286,13 +292,16 @@ input, select {
       </div>
     </div>
 
-    <!-- Ícone social agora independe do frame escolhido -->
     <div class="icon-options">
       <div class="field checkbox-field">
         <label>
           <input type="checkbox" id="icon-enabled">
           Adicionar ícone social sobre o QR Code
         </label>
+      </div>
+
+      <div id="ecc-notice" class="ecc-notice">
+        Correção de erro elevada para H automaticamente para garantir a leitura com o logo.
       </div>
 
       <div id="social-options" style="display:none">
@@ -338,9 +347,16 @@ let currentSocial = null;
 let iconEnabled = false;
 let renderTimeout = null;
 
-/* ---------- Ícones oficiais (paths reais, fonte: Simple Icons, CC0) ---------- */
+/* Ícones oficiais (fonte: Simple Icons, CC0).
+   WhatsApp usa dois paths: balão verde + telefone branco explícito,
+   garantindo o contraste exigido pelas diretrizes de marca da Meta. */
 const SOCIAL_ICONS = {
-  whatsapp: { color: "#25D366", path: "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12.001 2C6.478 2 2 6.477 2 12c0 1.797.472 3.484 1.298 4.94L2.06 22l5.19-1.211A9.947 9.947 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12.001 2z", viewBox: "0 0 24 24" },
+  whatsapp: {
+    color: "#25D366",
+    viewBox: "0 0 24 24",
+    path: "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12.001 2C6.478 2 2 6.477 2 12c0 1.797.472 3.484 1.298 4.94L2.06 22l5.19-1.211A9.947 9.947 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12.001 2z",
+    overlay: { fill: "#FFFFFF", path: "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" }
+  },
   instagram: { color: "url(#ig-grad)", path: "M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465a4.9 4.9 0 0 1 1.772 1.153 4.9 4.9 0 0 1 1.153 1.772c.248.637.415 1.363.465 2.428.05 1.066.06 1.405.06 4.122s-.01 3.056-.06 4.122c-.05 1.065-.217 1.79-.465 2.428a4.9 4.9 0 0 1-1.153 1.772 4.9 4.9 0 0 1-1.772 1.153c-.637.248-1.363.415-2.428.465-1.066.05-1.405.06-4.122.06s-3.056-.01-4.122-.06c-1.065-.05-1.79-.217-2.428-.465a4.9 4.9 0 0 1-1.772-1.153 4.9 4.9 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.01 15.056 2 14.717 2 12s.01-3.056.06-4.122c.05-1.065.217-1.79.465-2.428A4.9 4.9 0 0 1 3.678 3.678 4.9 4.9 0 0 1 5.45 2.525c.637-.248 1.363-.415 2.428-.465C8.944 2.01 9.283 2 12 2zm0 1.802c-2.67 0-2.986.01-4.04.059-.976.045-1.505.207-1.858.344-.466.181-.8.398-1.15.748a3.1 3.1 0 0 0-.748 1.15c-.137.353-.3.882-.344 1.857-.05 1.055-.06 1.372-.06 4.04s.01 2.986.06 4.04c.045.976.207 1.505.344 1.858.144.372.336.66.748 1.15.35.35.638.567 1.15.748.353.137.882.3 1.857.344 1.054.05 1.37.06 4.04.06s2.987-.01 4.04-.06c.976-.045 1.505-.207 1.858-.344a3.1 3.1 0 0 0 1.15-.748c.35-.35.567-.638.748-1.15.137-.353.3-.882.344-1.857.05-1.055.06-1.372.06-4.04s-.01-2.986-.06-4.04c-.045-.976-.207-1.505-.344-1.858a3.1 3.1 0 0 0-.748-1.15 3.1 3.1 0 0 0-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.055-.05-1.372-.06-4.04-.06zm0 3.063a5.135 5.135 0 1 1 0 10.27 5.135 5.135 0 0 1 0-10.27zm0 1.802a3.333 3.333 0 1 0 0 6.666 3.333 3.333 0 0 0 0-6.666zm5.338-1.809a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z", viewBox: "0 0 24 24" },
   youtube: { color: "#FF0000", path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186 31.28 31.28 0 0 0 0 12a31.28 31.28 0 0 0 .502 5.814 3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136A31.28 31.28 0 0 0 24 12a31.28 31.28 0 0 0-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", viewBox: "0 0 24 24" },
   facebook: { color: "#1877F2", path: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z", viewBox: "0 0 24 24" },
@@ -364,7 +380,10 @@ function buildSocialGrid() {
     const button = document.createElement("button");
     button.className = "social-button";
     button.dataset.social = key;
-    button.innerHTML = `<svg viewBox="${icon.viewBox}">${gradDefs}<path fill="${icon.color}" d="${icon.path}"/></svg>${SOCIAL_LABELS[key]}`;
+    let inner = `<svg viewBox="${icon.viewBox}">${gradDefs}<path fill="${icon.color}" d="${icon.path}"/>`;
+    if (icon.overlay) inner += `<path fill="${icon.overlay.fill}" d="${icon.overlay.path}"/>`;
+    inner += `</svg>${SOCIAL_LABELS[key]}`;
+    button.innerHTML = inner;
     button.addEventListener("click", function () {
       document.querySelectorAll(".social-button").forEach(item => item.classList.remove("active"));
       this.classList.add("active");
@@ -383,7 +402,6 @@ function updateCounter() {
   document.getElementById("counter").textContent = `${length} ${length === 1 ? "caractere" : "caracteres"}`;
 }
 
-/* ---------- Geração do QR com "olhos" tratados como peça única ---------- */
 function generateBaseQR() {
   const text = input.value.trim();
   const errorLevel = document.getElementById("error-level").value;
@@ -444,8 +462,6 @@ function drawModule(context, x, y, size, style) {
   context.fill();
 }
 
-/* Desenha o "olho" do QR como bloco único (anel externo 7x7 + miolo 3x3),
-   mudando apenas o raio das bordas conforme o estilo, sem fatiar módulo a módulo */
 function drawFinderPattern(context, x, y, moduleSize, style, color, bgColor) {
   const outer = moduleSize * 7;
   const middle = moduleSize * 5;
@@ -520,15 +536,16 @@ function computeLayout(position) {
   }
 }
 
-/* Ícone social sobreposto ao QR, independente do frame escolhido */
 function drawIconOverlay(qrCtx) {
-  if (!iconEnabled || !currentSocial) return;
+  if (!iconEnabled || !currentSocial) return Promise.resolve();
   const icon = SOCIAL_ICONS[currentSocial];
   const gradDefs = `<defs><linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
     <stop offset="0%" stop-color="#FEDA75"/><stop offset="30%" stop-color="#FA7E1E"/>
     <stop offset="55%" stop-color="#D62976"/><stop offset="80%" stop-color="#962FBF"/>
     <stop offset="100%" stop-color="#4F5BD5"/></linearGradient></defs>`;
-  const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${icon.viewBox}">${gradDefs}<path fill="${icon.color}" d="${icon.path}"/></svg>`;
+  let paths = `<path fill="${icon.color}" d="${icon.path}"/>`;
+  if (icon.overlay) paths += `<path fill="${icon.overlay.fill}" d="${icon.overlay.path}"/>`;
+  const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${icon.viewBox}">${gradDefs}${paths}</svg>`;
   const blob = new Blob([svgMarkup], { type: "image/svg+xml" });
   const url = URL.createObjectURL(blob);
   const image = new Image();
@@ -739,9 +756,13 @@ document.querySelectorAll(".frame-button").forEach(button => {
 document.getElementById("icon-enabled").addEventListener("change", function () {
   iconEnabled = this.checked;
   document.getElementById("social-options").style.display = iconEnabled ? "block" : "none";
-  if (iconEnabled && !currentSocial) {
-    currentSocial = "whatsapp";
-    document.querySelector('.social-button[data-social="whatsapp"]').classList.add("active");
+  document.getElementById("ecc-notice").classList.toggle("visible", iconEnabled);
+  if (iconEnabled) {
+    document.getElementById("error-level").value = "H";
+    if (!currentSocial) {
+      currentSocial = "whatsapp";
+      document.querySelector('.social-button[data-social="whatsapp"]').classList.add("active");
+    }
   }
   schedulePreview();
 });
