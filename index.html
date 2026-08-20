@@ -180,7 +180,7 @@ input[type="range"] {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 .preview-container { overflow: auto; padding: 5px; }
-#qr-canvas { display: block; width: 100%; max-width: 1000px; height: auto; margin: auto; }
+#qr-canvas { display: block; max-width: 1000px; height: auto; margin: auto; }
 .preview-info { margin-top: 11px; color: var(--muted); font-size: 0.8rem; }
 
 .footer { margin-top: 20px; text-align: center; color: #9a9daa; font-size: 0.75rem; }
@@ -651,9 +651,8 @@ async function render() {
 
   canvas.width = Math.round(layout.width * DPR);
   canvas.height = Math.round(layout.height * DPR);
-  canvas.style.width = "100%";
-  canvas.style.maxWidth = layout.width + "px";
-  canvas.style.aspectRatio = `${layout.width} / ${layout.height}`;
+  canvas.style.width = layout.width + "px";
+  canvas.style.height = layout.height + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
   const frameColor = isValidHex(document.getElementById("frame-color").value)
