@@ -616,11 +616,24 @@ input[type="range"] {
             </div>
 
             <div class="field">
-              <label class="field-label" for="frame-text-color">Cor do texto da moldura</label>
+              <label class="field-label" for="frame-text-color">
+                Cor do texto da moldura
+              </label>
 
               <div class="hex-row">
-                <input id="frame-text-color-picker" class="color-picker" type="color" value="#FFFFFF">
-                <input id="frame-text-color" class="hex-input" value="#FFFFFF" maxlength="7">
+                <input
+                  id="frame-text-color-picker"
+                  class="color-picker"
+                  type="color"
+                  value="#FFFFFF"
+                >
+
+                <input
+                  id="frame-text-color"
+                  class="hex-input"
+                  value="#FFFFFF"
+                  maxlength="7"
+                >
               </div>
             </div>
           </div>
@@ -656,8 +669,13 @@ input[type="range"] {
       </section>
 
       <div id="actions" class="actions">
-        <button id="download" class="action download" type="button">Baixar PNG</button>
-        <button id="share" class="action share" type="button">Compartilhar</button>
+        <button id="download" class="action download" type="button">
+          Baixar PNG
+        </button>
+
+        <button id="share" class="action share" type="button">
+          Compartilhar
+        </button>
       </div>
     </div>
   </div>
@@ -1136,13 +1154,16 @@ async function drawSocialIcon(context) {
   const pixelStyle = $("style").value;
 
   const iconSize = Math.round(size * 0.20);
+
+  /*
+    Só existe borda branca externa.
+    A moldura preta interna foi removida.
+  */
   const whiteBorder = getIconBorderThickness();
-  const blackBorder = getIconBorderThickness();
   const contentPadding = getIconContentPadding();
 
   const totalPadding =
     whiteBorder +
-    blackBorder +
     contentPadding;
 
   const outerSize =
@@ -1150,7 +1171,6 @@ async function drawSocialIcon(context) {
     totalPadding * 2;
 
   const center = size / 2;
-
   const outerX = Math.round(center - outerSize / 2);
   const outerY = Math.round(center - outerSize / 2);
 
@@ -1164,34 +1184,6 @@ async function drawSocialIcon(context) {
     outerSize,
     pixelStyle,
     "outer"
-  );
-
-  context.fill();
-
-  context.fillStyle = "#000000";
-
-  drawIconFrameShape(
-    context,
-    outerX + whiteBorder,
-    outerY + whiteBorder,
-    outerSize - whiteBorder * 2,
-    outerSize - whiteBorder * 2,
-    pixelStyle,
-    "inner"
-  );
-
-  context.fill();
-
-  context.fillStyle = "#FFFFFF";
-
-  drawIconFrameShape(
-    context,
-    outerX + whiteBorder + blackBorder,
-    outerY + whiteBorder + blackBorder,
-    outerSize - (whiteBorder + blackBorder) * 2,
-    outerSize - (whiteBorder + blackBorder) * 2,
-    pixelStyle,
-    "inner"
   );
 
   context.fill();
