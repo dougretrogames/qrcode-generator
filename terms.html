@@ -10,11 +10,20 @@
 <style>
 :root {
   --primary: #6D5DFC;
-  --background: #f4f5fb;
+  --primary-hover: #5B4AEB;
+  --primary-light: rgba(109, 93, 252, 0.08);
+  --primary-glow: rgba(109, 93, 252, 0.25);
+  --background: #f4f6fc;
   --card: #ffffff;
-  --text: #171827;
-  --muted: #777b8c;
-  --border: #e3e5ed;
+  --text: #121420;
+  --muted: #6e7387;
+  --border: #e2e5f0;
+  --input-bg: #f8f9fd;
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow-card: 0 24px 70px -12px rgba(109, 93, 252, 0.12), 0 0 0 1px rgba(226, 229, 240, 0.7);
+  --shadow-btn: 0 10px 24px -6px rgba(109, 93, 252, 0.45);
 }
 
 * {
@@ -29,23 +38,62 @@ html {
 
 body {
   min-height: 100vh;
-  padding: max(30px, env(safe-area-inset-top)) 14px max(30px, env(safe-area-inset-bottom));
+  padding: max(28px, env(safe-area-inset-top)) 16px max(32px, env(safe-area-inset-bottom));
   background:
-    radial-gradient(circle at 10% 0%, #6d5dfc22, transparent 32%),
-    radial-gradient(circle at 100% 100%, #6d5dfc18, transparent 30%),
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(109, 93, 252, 0.15), transparent),
+    radial-gradient(circle at 100% 100%, rgba(109, 93, 252, 0.08), transparent 40%),
     var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
 }
 
 .app {
   width: min(100%, 760px);
   margin: auto;
-  padding: 32px;
-  border-radius: 20px;
+  padding: 36px 32px;
+  border-radius: var(--radius-lg);
   background: var(--card);
-  box-shadow: 0 18px 55px rgba(28, 30, 52, 0.1);
+  box-shadow: var(--shadow-card);
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 650;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-1px);
 }
 
 .header {
@@ -60,27 +108,29 @@ body {
   margin: 0 auto 14px;
   place-items: center;
   border-radius: 16px;
-  background: linear-gradient(135deg, #6D5DFC, #897DFF);
-  box-shadow: 0 10px 25px #6D5DFC40;
+  background: linear-gradient(135deg, #6D5DFC, #8F82FF);
+  box-shadow: 0 10px 25px rgba(109, 93, 252, 0.35);
 }
 
-.logo::before {
-  width: 22px;
-  height: 22px;
-  content: "";
-  border: 4px solid white;
-  border-radius: 4px;
+.logo svg {
+  width: 26px;
+  height: 26px;
+  fill: white;
 }
 
 h1 {
-  font-size: clamp(1.4rem, 5vw, 1.8rem);
+  font-size: clamp(1.5rem, 5vw, 1.85rem);
+  font-weight: 850;
   letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text) 30%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 6px;
 }
 
 .subtitle {
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 .content {
@@ -122,10 +172,10 @@ h1 {
 
 .highlight-box {
   padding: 14px 18px;
-  border-radius: 12px;
-  background: #6D5DFC10;
+  border-radius: var(--radius-md);
+  background: var(--primary-light);
   border-left: 4px solid var(--primary);
-  margin: 16px 0;
+  margin: 18px 0;
   font-size: 0.92rem;
   color: var(--text);
 }
@@ -142,45 +192,49 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #6D5DFC, #7B6CFF);
+  padding: 12px 26px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #6D5DFC, #7F72FF);
   color: white;
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 750;
   font-size: 0.95rem;
-  box-shadow: 0 8px 18px #6D5DFC38;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-btn);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-back:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px #6D5DFC48;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -6px rgba(109, 93, 252, 0.55);
 }
 
 .footer {
-  margin-top: 24px;
-  color: #9a9daa;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
   text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
 }
 
-.footer a {
-  color: var(--primary);
-  text-decoration: none;
-}
-
-.footer a:hover {
-  text-decoration: underline;
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #12131c;
-    --card: #1b1c29;
-    --text: #f2f2f7;
-    --muted: #9498a8;
-    --border: #2c2e40;
+    --background: #0f1019;
+    --card: #171826;
+    --text: #f4f5fa;
+    --muted: #8d92a8;
+    --border: #282a3d;
+    --input-bg: #1f2033;
+    --primary-light: rgba(109, 93, 252, 0.15);
+    --shadow-card: 0 24px 70px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
   }
 
   .section p,
@@ -188,9 +242,9 @@ h1 {
     color: #b5b8c9;
   }
 
-  .highlight-box {
-    background: #6D5DFC20;
-    color: #e5e7eb;
+  .nav-btn {
+    background: var(--input-bg);
+    color: var(--text);
   }
 }
 </style>
@@ -198,8 +252,28 @@ h1 {
 
 <body>
 <main class="app">
+  <div class="top-bar">
+    <a href="index.html" class="nav-btn">
+      ← Voltar ao Gerador
+    </a>
+    <nav class="nav-links">
+      <a href="privacy.html" class="nav-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Privacidade
+      </a>
+      <a href="https://github.com/dougretrogames/qrcode-generator" target="_blank" rel="noopener" class="nav-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+
   <header class="header">
-    <div class="logo"></div>
+    <div class="logo">
+      <svg viewBox="0 0 24 24">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+    </div>
     <h1>Termos de Uso</h1>
     <p class="subtitle">Última atualização: Agosto de 2026</p>
   </header>
@@ -268,11 +342,11 @@ h1 {
   </div>
 
   <footer class="footer">
-    <p>
-      <a href="index.html">Gerador</a> • 
-      <a href="privacy.html">Política de Privacidade</a> • 
-      <a href="https://github.com/dougretrogames/qrcode-generator" target="_blank" rel="noopener">GitHub</a>
-    </p>
+    <div class="footer-nav">
+      <a href="index.html" class="nav-btn">Gerador</a>
+      <a href="privacy.html" class="nav-btn">Política de Privacidade</a>
+      <a href="https://github.com/dougretrogames/qrcode-generator" target="_blank" rel="noopener" class="nav-btn">GitHub</a>
+    </div>
   </footer>
 </main>
 </body>

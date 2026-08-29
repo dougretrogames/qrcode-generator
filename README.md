@@ -46,7 +46,7 @@ Um **Gerador de QR Code** moderno, responsivo, gratuito e **100% executado local
   - 10 cores predefinidas em swatches rápidos.
   - Seletor de cores nativo (Color Picker) + entrada manual de código HEX para frente (foreground) e fundo (background).
 - 📐 **Múltiplas Resoluções de Saída:**
-  - De 125 × 125 px até 1000 × 1000 px para uso digital ou impressão gráfica em alta qualidade.
+  - De 128 × 128 px até 1024 × 1024 px (128px, 256px, 384px, 512px, 640px, 768px, 896px, 1024px) para uso digital ou impressão gráfica em alta qualidade.
 - 💾 **Exportação e Compartilhamento:**
   - **Baixar PNG:** Download direto da imagem gerada.
   - **Compartilhar:** Integração com a **Web Share API** nativa para envio direto via WhatsApp, Telegram, e-mail, etc. (em dispositivos suportados).
