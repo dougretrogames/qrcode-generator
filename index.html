@@ -1645,14 +1645,16 @@ function fillInteriorHoles(imageData, width, height) {
   let head = 0;
   let tail = 0;
 
+  const isTransparent = idx => data[idx * 4 + 3] <= 25;
+
   for (let x = 0; x < width; x++) {
     const topIdx = x;
     const botIdx = (height - 1) * width + x;
-    if (data[topIdx * 4 + 3] === 0 && !visited[topIdx]) {
+    if (isTransparent(topIdx) && !visited[topIdx]) {
       visited[topIdx] = 1;
       queue[tail++] = topIdx;
     }
-    if (data[botIdx * 4 + 3] === 0 && !visited[botIdx]) {
+    if (isTransparent(botIdx) && !visited[botIdx]) {
       visited[botIdx] = 1;
       queue[tail++] = botIdx;
     }
@@ -1661,11 +1663,11 @@ function fillInteriorHoles(imageData, width, height) {
   for (let y = 0; y < height; y++) {
     const leftIdx = y * width;
     const rightIdx = y * width + (width - 1);
-    if (data[leftIdx * 4 + 3] === 0 && !visited[leftIdx]) {
+    if (isTransparent(leftIdx) && !visited[leftIdx]) {
       visited[leftIdx] = 1;
       queue[tail++] = leftIdx;
     }
-    if (data[rightIdx * 4 + 3] === 0 && !visited[rightIdx]) {
+    if (isTransparent(rightIdx) && !visited[rightIdx]) {
       visited[rightIdx] = 1;
       queue[tail++] = rightIdx;
     }
@@ -1678,28 +1680,28 @@ function fillInteriorHoles(imageData, width, height) {
 
     if (x > 0) {
       const nIdx = idx - 1;
-      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+      if (!visited[nIdx] && isTransparent(nIdx)) {
         visited[nIdx] = 1;
         queue[tail++] = nIdx;
       }
     }
     if (x < width - 1) {
       const nIdx = idx + 1;
-      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+      if (!visited[nIdx] && isTransparent(nIdx)) {
         visited[nIdx] = 1;
         queue[tail++] = nIdx;
       }
     }
     if (y > 0) {
       const nIdx = idx - width;
-      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+      if (!visited[nIdx] && isTransparent(nIdx)) {
         visited[nIdx] = 1;
         queue[tail++] = nIdx;
       }
     }
     if (y < height - 1) {
       const nIdx = idx + width;
-      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+      if (!visited[nIdx] && isTransparent(nIdx)) {
         visited[nIdx] = 1;
         queue[tail++] = nIdx;
       }
@@ -1712,6 +1714,11 @@ function fillInteriorHoles(imageData, width, height) {
       data[i * 4 + 1] = 255;
       data[i * 4 + 2] = 255;
       data[i * 4 + 3] = 255;
+    } else {
+      data[i * 4] = 0;
+      data[i * 4 + 1] = 0;
+      data[i * 4 + 2] = 0;
+      data[i * 4 + 3] = 0;
     }
   }
 }
