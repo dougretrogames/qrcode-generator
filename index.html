@@ -1035,19 +1035,7 @@ function schedulePreview() {
   timer = setTimeout(updatePreview, 1000);
 }
 
-function getSocialIconUrl(network) {
-  if (network.slug === "whatsapp") {
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(WHATSAPP_SVG)}`;
-  }
-
-  if (network.slug === "youtube") {
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(YOUTUBE_SVG)}`;
-  }
-
-  if (network.slug === "tiktok") {
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(TIKTOK_SVG)}`;
-  }
-
+function getSocialThumbnailUrl(network) {
   if (network.slug === "linkedin") {
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(LINKEDIN_SVG)}`;
   }
@@ -1076,7 +1064,7 @@ function buildSocialButtons() {
       aria-label="${network.label}"
     >
       <img
-        src="${getSocialIconUrl(network)}"
+        src="${getSocialThumbnailUrl(network)}"
         alt=""
         width="24"
         height="24"
@@ -1324,7 +1312,7 @@ async function fetchSvgAsImage(network) {
   } else if (network.slug === "linkedin") {
     svgText = LINKEDIN_SVG;
   } else {
-    const response = await fetch(getSocialIconUrl(network));
+    const response = await fetch(getSocialThumbnailUrl(network));
     if (!response.ok) {
       throw new Error("Não foi possível carregar o ícone.");
     }
