@@ -1138,17 +1138,19 @@ input[type="range"] {
             <span class="sub-card-icon">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
             </span>
-            Ícone Social Central
+            Ícone Central
           </div>
 
           <label class="check">
             <input id="icon-enabled" type="checkbox">
-            Adicionar ícone social sobre o QR Code
+            Adicionar ícone sobre o QR Code
           </label>
 
           <div id="notice" class="notice">
             Correção de erro elevada para H (30%) automaticamente para garantir leitura 100% confiável.
           </div>
+
+          <input type="file" id="custom-icon-input" accept="image/*" style="display: none;">
 
           <div id="socials" class="socials"></div>
         </div>
@@ -1207,6 +1209,7 @@ let bg = "#FFFFFF";
 let frame = "none";
 let thick = getDefaultFrameThickness();
 let selectedSocial = "whatsapp";
+let customImageSrc = null;
 let timer = null;
 
 const colors = [
@@ -1318,7 +1321,7 @@ function buildSwatches() {
 }
 
 function buildSocialButtons() {
-  $("socials").innerHTML = Object.entries(SOCIAL_NETWORKS).map(([key, network]) => `
+  const socialButtonsHtml = Object.entries(SOCIAL_NETWORKS).map(([key, network]) => `
     <button
       class="social-btn ${key === selectedSocial ? "active" : ""}"
       data-social="${key}"
@@ -1334,6 +1337,25 @@ function buildSocialButtons() {
       ${network.label}
     </button>
   `).join("");
+
+  const customThumb = customImageSrc
+    ? `<img src="${customImageSrc}" alt="" width="24" height="24" style="border-radius:4px; object-fit:contain;">`
+    : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+
+  const customBtnHtml = `
+    <button
+      class="social-btn ${selectedSocial === "custom" ? "active" : ""}"
+      data-social="custom"
+      type="button"
+      aria-label="Upload de Ícone Próprio"
+      title="${customImageSrc ? "Clique para trocar o ícone" : "Enviar ícone personalizado"}"
+    >
+      ${customThumb}
+      ${customImageSrc ? "Meu Ícone" : "Upload"}
+    </button>
+  `;
+
+  $("socials").innerHTML = socialButtonsHtml + customBtnHtml;
 }
 
 function drawModule(context, x, y, moduleSize, type) {
@@ -1604,23 +1626,62 @@ async function fetchSvgAsImage(network) {
   });
 }
 
+function fetchCustomImage() {
+  if (!customImageSrc) return Promise.reject(new Error("Nenhum ícone personalizado"));
+
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Falha ao carregar ícone personalizado"));
+    image.src = customImageSrc;
+  });
+}
+
 async function drawSocialIcon(context) {
   if (!$("icon-enabled").checked) return;
 
-  const network = SOCIAL_NETWORKS[selectedSocial];
-  if (!network) return;
-
   try {
-    const image = await fetchSvgAsImage(network);
+    let image;
+    if (selectedSocial === "custom") {
+      image = await fetchCustomImage();
+    } else {
+      const network = SOCIAL_NETWORKS[selectedSocial];
+      if (!network) return;
+      image = await fetchSvgAsImage(network);
+    }
 
-    const iconSize = Math.round(size * 0.20);
+    const maxIconSize = Math.round(size * 0.20);
+    let iconW = maxIconSize;
+    let iconH = maxIconSize;
+
+    if (image.naturalWidth && image.naturalHeight) {
+      const aspect = image.naturalWidth / image.naturalHeight;
+      if (aspect >= 1) {
+        iconW = maxIconSize;
+        iconH = Math.max(8, Math.round(maxIconSize / aspect));
+      } else {
+        iconH = maxIconSize;
+        iconW = Math.max(8, Math.round(maxIconSize * aspect));
+      }
+    } else if (image.width && image.height) {
+      const aspect = image.width / image.height;
+      if (aspect >= 1) {
+        iconW = maxIconSize;
+        iconH = Math.max(8, Math.round(maxIconSize / aspect));
+      } else {
+        iconH = maxIconSize;
+        iconW = Math.max(8, Math.round(maxIconSize * aspect));
+      }
+    }
+
     const borderThickness = getIconSilhouetteThickness();
     const pad = borderThickness + 4;
-    const canvasSize = iconSize + pad * 2;
+    const canvasW = iconW + pad * 2;
+    const canvasH = iconH + pad * 2;
 
     const outlineCanvas = document.createElement("canvas");
-    outlineCanvas.width = canvasSize;
-    outlineCanvas.height = canvasSize;
+    outlineCanvas.width = canvasW;
+    outlineCanvas.height = canvasH;
     const outlineCtx = outlineCanvas.getContext("2d");
 
     outlineCtx.fillStyle = "#FFFFFF";
@@ -1628,9 +1689,9 @@ async function drawSocialIcon(context) {
     // 1. Fundo branco sob o ícone (respiro e eliminação de vazamentos)
     if (selectedSocial === "facebook" || selectedSocial === "telegram") {
       // Fundo circular concêntrico com respiro branco
-      const cx = pad + iconSize / 2;
-      const cy = pad + iconSize / 2;
-      const radius = iconSize / 2 + borderThickness;
+      const cx = pad + iconW / 2;
+      const cy = pad + iconH / 2;
+      const radius = iconW / 2 + borderThickness;
       outlineCtx.beginPath();
       outlineCtx.arc(cx, cy, radius, 0, Math.PI * 2);
       outlineCtx.fill();
@@ -1640,22 +1701,22 @@ async function drawSocialIcon(context) {
         outlineCtx,
         pad - borderThickness,
         pad - borderThickness,
-        iconSize + borderThickness * 2,
-        iconSize + borderThickness * 2,
-        (iconSize + borderThickness * 2) * 0.26
+        iconW + borderThickness * 2,
+        iconH + borderThickness * 2,
+        (iconW + borderThickness * 2) * 0.26
       );
       outlineCtx.fill();
     } else {
-      // Para ícones com silhueta contornada uniforme (YouTube, WhatsApp, X, TikTok, LinkedIn, Discord, Threads):
+      // Para ícones com silhueta contornada uniforme (YouTube, WhatsApp, X, TikTok, LinkedIn, Discord, Threads, Personalizado):
       const maskCanvas = document.createElement("canvas");
-      maskCanvas.width = canvasSize;
-      maskCanvas.height = canvasSize;
+      maskCanvas.width = canvasW;
+      maskCanvas.height = canvasH;
       const maskCtx = maskCanvas.getContext("2d");
 
-      maskCtx.drawImage(image, pad, pad, iconSize, iconSize);
+      maskCtx.drawImage(image, pad, pad, iconW, iconH);
       maskCtx.globalCompositeOperation = "source-in";
       maskCtx.fillStyle = "#FFFFFF";
-      maskCtx.fillRect(0, 0, canvasSize, canvasSize);
+      maskCtx.fillRect(0, 0, canvasW, canvasH);
 
       for (let r = 1; r <= borderThickness; r += 1) {
         const angleSteps = Math.max(12, Math.ceil(r * 6));
@@ -1670,12 +1731,12 @@ async function drawSocialIcon(context) {
     }
 
     // 2. Desenhar o ícone oficial intacto e colorido por cima
-    outlineCtx.drawImage(image, pad, pad, iconSize, iconSize);
+    outlineCtx.drawImage(image, pad, pad, iconW, iconH);
 
     // 3. Desenhar o resultado final perfeitamente centralizado no QR Code
     const center = size / 2;
-    const drawX = Math.round(center - canvasSize / 2);
-    const drawY = Math.round(center - canvasSize / 2);
+    const drawX = Math.round(center - canvasW / 2);
+    const drawY = Math.round(center - canvasH / 2);
 
     context.drawImage(outlineCanvas, drawX, drawY);
   } catch {
@@ -1930,17 +1991,40 @@ $("swatches").addEventListener("click", event => {
   schedulePreview();
 });
 
+$("custom-icon-input").addEventListener("change", event => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    customImageSrc = e.target.result;
+    selectedSocial = "custom";
+    buildSocialButtons();
+    schedulePreview();
+  };
+  reader.readAsDataURL(file);
+});
+
 $("socials").addEventListener("click", event => {
   const button = event.target.closest("[data-social]");
 
   if (!button) return;
 
-  selectedSocial = button.dataset.social;
+  const social = button.dataset.social;
 
-  document.querySelectorAll(".social-btn").forEach(item => {
-    item.classList.toggle("active", item === button);
-  });
+  if (social === "custom") {
+    if (!customImageSrc || selectedSocial === "custom") {
+      $("custom-icon-input").click();
+    } else {
+      selectedSocial = "custom";
+      buildSocialButtons();
+      schedulePreview();
+    }
+    return;
+  }
 
+  selectedSocial = social;
+  buildSocialButtons();
   schedulePreview();
 });
 
