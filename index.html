@@ -1000,6 +1000,11 @@ function getMargin() {
   return Math.max(8, Math.round(size * 0.06));
 }
 
+/* Espessura suave e ajustada para a silhueta do ícone social */
+function getIconSilhouetteThickness() {
+  return Math.max(3, Math.round(size * 0.018));
+}
+
 function getDefaultFrameThickness(qrSize = size) {
   return Math.max(14, Math.round(qrSize * 0.112));
 }
@@ -1344,7 +1349,7 @@ async function drawSocialIcon(context) {
     const image = await fetchSvgAsImage(network);
 
     const iconSize = Math.round(size * 0.20);
-    const borderThickness = getMargin();
+    const borderThickness = getIconSilhouetteThickness();
     const pad = borderThickness + 4;
     const canvasSize = iconSize + pad * 2;
 
@@ -1365,7 +1370,7 @@ async function drawSocialIcon(context) {
     outlineCanvas.height = canvasSize;
     const outlineCtx = outlineCanvas.getContext("2d");
 
-    // Dilatação radial em passos de 1px cobrindo 360 graus com a mesma espessura da margem do QR code
+    // Dilatação radial em passos de 1px cobrindo 360 graus com contorno suave e discreto
     for (let r = 1; r <= borderThickness; r += 1) {
       const angleSteps = Math.max(12, Math.ceil(r * 6));
       for (let i = 0; i < angleSteps; i++) {
