@@ -960,6 +960,15 @@ const colors = [
   "#0891B2"
 ];
 
+const LINKEDIN_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path
+    fill="#0A66C2"
+    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556z"
+  />
+</svg>
+`;
+
 const SOCIAL_NETWORKS = {
   whatsapp: { label: "WhatsApp", slug: "whatsapp", color: "#25D366" },
   instagram: { label: "Instagram", slug: "instagram", color: "#E4405F" },
@@ -1009,6 +1018,10 @@ function schedulePreview() {
 }
 
 function getSocialIconUrl(network) {
+  if (network.slug === "linkedin") {
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(LINKEDIN_SVG)}`;
+  }
+
   return `https://cdn.simpleicons.org/${network.slug}/${network.color.replace("#", "")}`;
 }
 
@@ -1270,11 +1283,17 @@ function getLayout() {
 }
 
 async function fetchSvgAsImage(network) {
-  const response = await fetch(getSocialIconUrl(network));
-  if (!response.ok) {
-    throw new Error("Não foi possível carregar o ícone.");
+  let svgText;
+
+  if (network.slug === "linkedin") {
+    svgText = LINKEDIN_SVG;
+  } else {
+    const response = await fetch(getSocialIconUrl(network));
+    if (!response.ok) {
+      throw new Error("Não foi possível carregar o ícone.");
+    }
+    svgText = await response.text();
   }
-  const svgText = await response.text();
 
   const blob = new Blob([svgText], {
     type: "image/svg+xml"
