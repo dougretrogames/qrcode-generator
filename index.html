@@ -1744,6 +1744,38 @@ function createSolidSilhouette(imageData, width, height) {
   }
 }
 
+function getHighQualityScaledImage(image, targetW, targetH) {
+  let curW = image.naturalWidth || image.width;
+  let curH = image.naturalHeight || image.height;
+
+  if (!curW || !curH || (curW <= targetW * 2 && curH <= targetH * 2)) {
+    return image;
+  }
+
+  let sourceCanvas = document.createElement("canvas");
+  sourceCanvas.width = curW;
+  sourceCanvas.height = curH;
+  let sCtx = sourceCanvas.getContext("2d");
+  sCtx.imageSmoothingEnabled = true;
+  sCtx.imageSmoothingQuality = "high";
+  sCtx.drawImage(image, 0, 0, curW, curH);
+
+  while (curW / 2 >= targetW && curH / 2 >= targetH) {
+    curW = Math.round(curW / 2);
+    curH = Math.round(curH / 2);
+    const nextCanvas = document.createElement("canvas");
+    nextCanvas.width = curW;
+    nextCanvas.height = curH;
+    const nCtx = nextCanvas.getContext("2d");
+    nCtx.imageSmoothingEnabled = true;
+    nCtx.imageSmoothingQuality = "high";
+    nCtx.drawImage(sourceCanvas, 0, 0, curW, curH);
+    sourceCanvas = nextCanvas;
+  }
+
+  return sourceCanvas;
+}
+
 async function drawSocialIcon(context) {
   if (!$("icon-enabled").checked) return;
 
@@ -1781,6 +1813,8 @@ async function drawSocialIcon(context) {
       }
     }
 
+    const scaledImage = getHighQualityScaledImage(image, iconW, iconH);
+
     const borderThickness = getIconSilhouetteThickness();
     const pad = borderThickness + 4;
     const canvasW = iconW + pad * 2;
@@ -1790,6 +1824,8 @@ async function drawSocialIcon(context) {
     outlineCanvas.width = canvasW;
     outlineCanvas.height = canvasH;
     const outlineCtx = outlineCanvas.getContext("2d");
+    outlineCtx.imageSmoothingEnabled = true;
+    outlineCtx.imageSmoothingQuality = "high";
 
     outlineCtx.fillStyle = "#FFFFFF";
 
@@ -1798,8 +1834,10 @@ async function drawSocialIcon(context) {
     maskCanvas.width = canvasW;
     maskCanvas.height = canvasH;
     const maskCtx = maskCanvas.getContext("2d");
+    maskCtx.imageSmoothingEnabled = true;
+    maskCtx.imageSmoothingQuality = "high";
 
-    maskCtx.drawImage(image, pad, pad, iconW, iconH);
+    maskCtx.drawImage(scaledImage, pad, pad, iconW, iconH);
 
     const maskImgData = maskCtx.getImageData(0, 0, canvasW, canvasH);
     createSolidSilhouette(maskImgData, canvasW, canvasH);
@@ -1817,14 +1855,16 @@ async function drawSocialIcon(context) {
     }
     outlineCtx.drawImage(maskCanvas, 0, 0);
 
-    // 3. Desenhar o ícone colorido/original por cima da camada de fundo branca sólida
-    outlineCtx.drawImage(image, pad, pad, iconW, iconH);
+    // 3. Desenhar o ícone em alta nitidez por cima da camada de fundo branca sólida
+    outlineCtx.drawImage(scaledImage, pad, pad, iconW, iconH);
 
     // 4. Centralizar o resultado no QR Code
     const center = size / 2;
     const drawX = Math.round(center - canvasW / 2);
     const drawY = Math.round(center - canvasH / 2);
 
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
     context.drawImage(outlineCanvas, drawX, drawY);
   } catch {
     /* Mantém o QR funcional se algum ícone não carregar. */
@@ -1860,6 +1900,8 @@ async function render() {
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.textRendering = "geometricPrecision";
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
   const frameColor = isHex($("frame-color").value)
     ? $("frame-color").value.toUpperCase()
