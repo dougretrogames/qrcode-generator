@@ -2,9 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#6D5DFC">
-<title>Gerador de QR Code</title>
+<title>Gerador de QR Code — Personalizado, Rápido e Gratuito</title>
+<meta name="description" content="Gerador de QR Code gratuito, moderno e 100% privado. Personalize formatos de pixels, cores, molduras com texto e ícones de redes sociais com download em PNG.">
+<meta property="og:title" content="Gerador de QR Code — Personalizado, Rápido e Gratuito">
+<meta property="og:description" content="Crie, personalize e baixe QR Codes em alta resolução com molduras, logos sociais e estilos exclusivos. Processamento 100% no navegador.">
+<meta property="og:type" content="website">
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 
@@ -401,6 +405,17 @@ input[type="range"] {
   color: #9a9daa;
   text-align: center;
   font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.footer a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer a:hover {
+  text-decoration: underline;
 }
 
 @media (min-width: 900px) {
@@ -681,7 +696,12 @@ input[type="range"] {
   </div>
 
   <footer class="footer">
-    Tudo é processado localmente no navegador. Ícones via Simple Icons.
+    <p>Tudo é processado localmente no navegador. Ícones via Simple Icons.</p>
+    <p>
+      <a href="terms.html">Termos de Uso</a> • 
+      <a href="privacy.html">Privacidade</a> • 
+      <a href="https://github.com/dougretrogames/qrcode-generator" target="_blank" rel="noopener">GitHub</a>
+    </p>
   </footer>
 </main>
 

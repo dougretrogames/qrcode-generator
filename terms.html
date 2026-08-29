@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6D5DFC">
+<title>Termos de Uso — Gerador de QR Code</title>
+<meta name="description" content="Termos de Uso do Gerador de QR Code. Entenda as diretrizes e condições de utilização da nossa ferramenta gratuita.">
+
+<style>
+:root {
+  --primary: #6D5DFC;
+  --background: #f4f5fb;
+  --card: #ffffff;
+  --text: #171827;
+  --muted: #777b8c;
+  --border: #e3e5ed;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  padding: max(30px, env(safe-area-inset-top)) 14px max(30px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 10% 0%, #6d5dfc22, transparent 32%),
+    radial-gradient(circle at 100% 100%, #6d5dfc18, transparent 30%),
+    var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.app {
+  width: min(100%, 760px);
+  margin: auto;
+  padding: 32px;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: 0 18px 55px rgba(28, 30, 52, 0.1);
+}
+
+.header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.logo {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6D5DFC, #897DFF);
+  box-shadow: 0 10px 25px #6D5DFC40;
+}
+
+.logo::before {
+  width: 22px;
+  height: 22px;
+  content: "";
+  border: 4px solid white;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: clamp(1.4rem, 5vw, 1.8rem);
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.content {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.section h2 {
+  font-size: 1.15rem;
+  font-weight: 750;
+  margin-bottom: 10px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section p {
+  color: #4a4d5e;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.section ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+  color: #4a4d5e;
+  font-size: 0.95rem;
+}
+
+.section li {
+  margin-bottom: 6px;
+}
+
+.highlight-box {
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #6D5DFC10;
+  border-left: 4px solid var(--primary);
+  margin: 16px 0;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.back-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6D5DFC, #7B6CFF);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 18px #6D5DFC38;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-back:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px #6D5DFC48;
+}
+
+.footer {
+  margin-top: 24px;
+  color: #9a9daa;
+  text-align: center;
+  font-size: 0.78rem;
+}
+
+.footer a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #12131c;
+    --card: #1b1c29;
+    --text: #f2f2f7;
+    --muted: #9498a8;
+    --border: #2c2e40;
+  }
+
+  .section p,
+  .section ul {
+    color: #b5b8c9;
+  }
+
+  .highlight-box {
+    background: #6D5DFC20;
+    color: #e5e7eb;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+  <header class="header">
+    <div class="logo"></div>
+    <h1>Termos de Uso</h1>
+    <p class="subtitle">Última atualização: Agosto de 2026</p>
+  </header>
+
+  <div class="content">
+    <div class="highlight-box">
+      <strong>Resumo:</strong> Este gerador de QR Code é uma ferramenta 100% gratuita e de código aberto. Todo o processamento ocorre exclusivamente no seu navegador (client-side), sem envio de dados para servidores externos.
+    </div>
+
+    <section class="section">
+      <h2>1. Aceitação dos Termos</h2>
+      <p>
+        Ao acessar e utilizar o <strong>Gerador de QR Code</strong>, você concorda expressamente em cumprir e estar vinculado aos presentes Termos de Uso. Caso não concorde com qualquer disposição aqui estabelecida, recomendamos a não utilização da ferramenta.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>2. Descrição do Serviço</h2>
+      <p>
+        O Gerador de QR Code é uma aplicação web destinada à criação, estilização e download de códigos QR em formato de imagem (PNG). A aplicação funciona integralmente no lado do cliente (client-side), o que significa que textos, links e dados inseridos não são transmitidos, gravados ou armazenados em nenhum servidor ou banco de dados externo.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>3. Responsabilidade do Usuário</h2>
+      <p>Você é integral e exclusivamente responsável por todas as informações, links e conteúdos inseridos na geração dos códigos QR. É vedado utilizar a ferramenta para:</p>
+      <ul>
+        <li>Gerar códigos que apontem para links maliciosos, esquemas de phishing, malware ou vírus;</li>
+        <li>Promover atividades ilegais, difamatórias, fraudulentas ou que violem leis vigentes;</li>
+        <li>Violar direitos autorais, marcas registradas ou direitos de propriedade intelectual de terceiros.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>4. Propriedade Intelectual e Marcas de Terceiros</h2>
+      <p>
+        O código-fonte desta aplicação está sob a licença de código aberto <strong>MIT</strong>.
+      </p>
+      <p>
+        Os logotipos e marcas de redes sociais (como WhatsApp, Instagram, YouTube, Facebook, LinkedIn, X, Telegram, TikTok, Discord, Threads) disponibilizados como opção estética pertencem exclusivamente aos seus respectivos titulares e são utilizados apenas para fins de identificação visual fornecida pela biblioteca de código aberto Simple Icons. O uso desses ícones não implica qualquer endosso, patrocínio ou afiliação oficial com as referidas marcas.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>5. Isenção de Garantias e Limitação de Responsabilidade</h2>
+      <p>
+        A ferramenta é fornecida "no estado em que se encontra" (<em>as is</em>), sem garantias de qualquer tipo, expressas ou implícitas. Embora a ferramenta utilize algoritmos padronizados de geração de QR Code e níveis de correção de erro (ECC), recomendamos que você sempre teste a leitura do QR Code antes de utilizá-lo em materiais impressos, campanhas publicitárias ou produções em escala.
+      </p>
+      <p>
+        Em nenhuma circunstância o autor ou os colaboradores serão responsabilizados por eventuais perdas, custos de impressão incorreta ou danos decorrentes da utilização direta ou indireta dos códigos gerados.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>6. Alterações nos Termos</h2>
+      <p>
+        Estes termos podem ser atualizados periodicamente para refletir melhorias ou alterações no projeto. O uso continuado da aplicação após a publicação de alterações constituirá a sua aceitação dos novos termos.
+      </p>
+    </section>
+
+    <div class="back-action">
+      <a href="index.html" class="btn-back">
+        ← Voltar ao Gerador
+      </a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>
+      <a href="index.html">Gerador</a> • 
+      <a href="privacy.html">Política de Privacidade</a> • 
+      <a href="https://github.com/dougretrogames/qrcode-generator" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+</main>
+</body>
+</html>

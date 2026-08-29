@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6D5DFC">
+<title>Política de Privacidade — Gerador de QR Code</title>
+<meta name="description" content="Política de Privacidade do Gerador de QR Code. Saiba como garantimos a proteção absoluta da sua privacidade processando tudo localmente.">
+
+<style>
+:root {
+  --primary: #6D5DFC;
+  --background: #f4f5fb;
+  --card: #ffffff;
+  --text: #171827;
+  --muted: #777b8c;
+  --border: #e3e5ed;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  padding: max(30px, env(safe-area-inset-top)) 14px max(30px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 10% 0%, #6d5dfc22, transparent 32%),
+    radial-gradient(circle at 100% 100%, #6d5dfc18, transparent 30%),
+    var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.app {
+  width: min(100%, 760px);
+  margin: auto;
+  padding: 32px;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: 0 18px 55px rgba(28, 30, 52, 0.1);
+}
+
+.header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.logo {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6D5DFC, #897DFF);
+  box-shadow: 0 10px 25px #6D5DFC40;
+}
+
+.logo::before {
+  width: 22px;
+  height: 22px;
+  content: "";
+  border: 4px solid white;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: clamp(1.4rem, 5vw, 1.8rem);
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.content {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.section h2 {
+  font-size: 1.15rem;
+  font-weight: 750;
+  margin-bottom: 10px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section p {
+  color: #4a4d5e;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.section ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+  color: #4a4d5e;
+  font-size: 0.95rem;
+}
+
+.section li {
+  margin-bottom: 6px;
+}
+
+.highlight-box {
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #16A34A12;
+  border-left: 4px solid #16A34A;
+  margin: 16px 0;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.back-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6D5DFC, #7B6CFF);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 18px #6D5DFC38;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-back:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px #6D5DFC48;
+}
+
+.footer {
+  margin-top: 24px;
+  color: #9a9daa;
+  text-align: center;
+  font-size: 0.78rem;
+}
+
+.footer a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #12131c;
+    --card: #1b1c29;
+    --text: #f2f2f7;
+    --muted: #9498a8;
+    --border: #2c2e40;
+  }
+
+  .section p,
+  .section ul {
+    color: #b5b8c9;
+  }
+
+  .highlight-box {
+    background: #16A34A20;
+    color: #e5e7eb;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+  <header class="header">
+    <div class="logo"></div>
+    <h1>Política de Privacidade</h1>
+    <p class="subtitle">Última atualização: Agosto de 2026</p>
+  </header>
+
+  <div class="content">
+    <div class="highlight-box">
+      <strong>🔒 Privacidade Total:</strong> Respeitamos integralmente a sua privacidade. Esta ferramenta foi desenvolvida sob o conceito de <em>Privacy by Design</em> — nenhuma informação digitada ou gerada sai do seu navegador.
+    </div>
+
+    <section class="section">
+      <h2>1. Coleta e Armazenamento de Dados</h2>
+      <p>
+        <strong>Nós não coletamos, não transmitimos e não armazenamos nenhuma informação pessoal ou conteúdo gerado.</strong>
+      </p>
+      <p>
+        Qualquer texto, URL, senha de Wi-Fi, telefone ou dado inserido no campo de texto é processado em tempo real e desenhado diretamente no elemento HTML5 <code>&lt;canvas&gt;</code> pelo seu próprio dispositivo.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>2. Processamento Local (Client-Side)</h2>
+      <p>
+        Diferente de geradores tradicionais que enviam seus dados para um servidor para renderizar imagens, este projeto utiliza a biblioteca JavaScript <code>qrcode-generator</code> executada localmente no seu computador ou celular. Isso garante que:
+      </p>
+      <ul>
+        <li>Nenhum log com seus dados é gravado;</li>
+        <li>Nenhum banco de dados armazena os seus códigos gerados;</li>
+        <li>A ferramenta funciona com máxima privacidade mesmo para dados sensíveis.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>3. Cookies e Rastreamento</h2>
+      <p>
+        A nossa aplicação:
+      </p>
+      <ul>
+        <li><strong>Não utiliza cookies</strong> de rastreamento, publicidade ou identificação;</li>
+        <li><strong>Não utiliza ferramentas de terceiros</strong> para análise de perfil comportamental;</li>
+        <li><strong>Não exibe anúncios publicitários</strong> de redes de terceiros.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>4. Carregamento de Recursos Externos (CDNs)</h2>
+      <p>
+        Para o funcionamento adequado da interface e ícones, a página carrega os seguintes recursos estáticos:
+      </p>
+      <ul>
+        <li><strong>jsDelivr:</strong> CDN utilizada para servir o script de cálculo matemático dos módulos do QR Code.</li>
+        <li><strong>Simple Icons CDN:</strong> Utilizada para carregar vetores (SVGs) oficiais das marcas e redes sociais quando ativada a opção correspondente.</li>
+      </ul>
+      <p>
+        Essas redes de distribuição de conteúdo podem registrar solicitações HTTP padrão (como endereço IP e cabeçalhos de requisição) estritamente necessárias para a entrega técnica dos arquivos estáticos.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>5. Permissões do Navegador</h2>
+      <p>
+        A funcionalidade "Compartilhar" utiliza a API nativa do navegador (<strong>Web Share API</strong>), acionando o menu oficial do seu sistema operacional para envio da imagem gerada para outros aplicativos. Nenhuma permissão especial ou invasiva é solicitada.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>6. Conformidade com a LGPD e GDPR</h2>
+      <p>
+        Por não realizar coleta, tratamento ou armazenamento de dados pessoais em servidores, o serviço cumpre integralmente os princípios da Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018) e do Regulamento Geral sobre a Proteção de Dados da União Europeia (GDPR).
+      </p>
+    </section>
+
+    <div class="back-action">
+      <a href="index.html" class="btn-back">
+        ← Voltar ao Gerador
+      </a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>
+      <a href="index.html">Gerador</a> • 
+      <a href="terms.html">Termos de Uso</a> • 
+      <a href="https://github.com/dougretrogames/qrcode-generator" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+</main>
+</body>
+</html>
