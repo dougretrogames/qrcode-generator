@@ -1099,7 +1099,7 @@ input[type="range"] {
             <div class="grid">
               <div class="field">
                 <label class="field-label" for="frame-text">Texto da moldura</label>
-                <input id="frame-text" value="Acesse aqui" maxlength="70">
+                <input id="frame-text" value="Acesse aqui" placeholder="Deixe vazio para moldura sem texto" maxlength="70">
               </div>
 
               <div class="field">
@@ -1522,57 +1522,104 @@ function generateBaseQR() {
 }
 
 function getLayout() {
-  const ring = Math.round(thick * 0.36);
-  const bottomHeight = thick + 16;
+  const frameText = $("frame-text") ? $("frame-text").value.trim() : "";
+  const hasText = Boolean(frameText);
+  const ring = Math.max(8, Math.round(thick * 0.36));
+  const bottomHeight = hasText ? thick + 16 : ring;
 
   if (frame === "top") {
+    if (!hasText) {
+      return {
+        width: size,
+        height: size + GAP + ring,
+        qrX: 0,
+        qrY: ring + GAP,
+        bar: [0, 0, size, ring, "horizontal"],
+        hasText: false
+      };
+    }
     return {
       width: size,
       height: size + GAP + thick,
       qrX: 0,
       qrY: thick + GAP,
-      bar: [0, 0, size, thick, "horizontal"]
+      bar: [0, 0, size, thick, "horizontal"],
+      hasText: true
     };
   }
 
   if (frame === "bottom") {
+    if (!hasText) {
+      return {
+        width: size,
+        height: size + GAP + ring,
+        qrX: 0,
+        qrY: 0,
+        bar: [0, size + GAP, size, ring, "horizontal"],
+        hasText: false
+      };
+    }
     return {
       width: size,
       height: size + GAP + thick,
       qrX: 0,
       qrY: 0,
-      bar: [0, size + GAP, size, thick, "horizontal"]
+      bar: [0, size + GAP, size, thick, "horizontal"],
+      hasText: true
     };
   }
 
   if (frame === "left") {
+    if (!hasText) {
+      return {
+        width: size + GAP + ring,
+        height: size,
+        qrX: ring + GAP,
+        qrY: 0,
+        bar: [0, 0, ring, size, "vertical", -1],
+        hasText: false
+      };
+    }
     return {
       width: size + GAP + thick,
       height: size,
       qrX: thick + GAP,
       qrY: 0,
-      bar: [0, 0, thick, size, "vertical", -1]
+      bar: [0, 0, thick, size, "vertical", -1],
+      hasText: true
     };
   }
 
   if (frame === "right") {
+    if (!hasText) {
+      return {
+        width: size + GAP + ring,
+        height: size,
+        qrX: 0,
+        qrY: 0,
+        bar: [size + GAP, 0, ring, size, "vertical", 1],
+        hasText: false
+      };
+    }
     return {
       width: size + GAP + thick,
       height: size,
       qrX: 0,
       qrY: 0,
-      bar: [size + GAP, 0, thick, size, "vertical", 1]
+      bar: [size + GAP, 0, thick, size, "vertical", 1],
+      hasText: true
     };
   }
 
   if (frame === "full") {
     return {
       width: size + ring * 2,
-      height: ring + size + bottomHeight,
+      height: size + ring + bottomHeight,
       qrX: ring,
       qrY: ring,
       full: true,
-      bottomHeight
+      bottomHeight,
+      hasText
     };
   }
 
@@ -1580,7 +1627,8 @@ function getLayout() {
     width: size,
     height: size,
     qrX: 0,
-    qrY: 0
+    qrY: 0,
+    hasText: false
   };
 }
 
@@ -1870,7 +1918,8 @@ async function render() {
     ? $("frame-text-color").value.toUpperCase()
     : "#FFFFFF";
 
-  const frameText = $("frame-text").value.trim() || "Acesse aqui";
+  const frameText = $("frame-text").value.trim();
+  const hasText = Boolean(frameText);
   const roundedFrame = $("rounded-frame").checked;
 
   if (roundedFrame) {
@@ -1888,19 +1937,21 @@ async function render() {
 
     ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, size, size);
 
-    ctx.fillStyle = frameTextColor;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    if (hasText) {
+      ctx.fillStyle = frameTextColor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
-    ctx.font = getTextFont(
-      fitText(ctx, frameText, layout.width - 50, thick * 0.42)
-    );
+      ctx.font = getTextFont(
+        fitText(ctx, frameText, layout.width - 50, thick * 0.42)
+      );
 
-    ctx.fillText(
-      frameText,
-      Math.round(layout.width / 2),
-      Math.round(layout.qrY + size + layout.bottomHeight / 2)
-    );
+      ctx.fillText(
+        frameText,
+        Math.round(layout.width / 2),
+        Math.round(layout.qrY + size + layout.bottomHeight / 2)
+      );
+    }
   } else {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, layout.width, layout.height);
@@ -1912,37 +1963,39 @@ async function render() {
     ctx.fillStyle = frameColor;
     ctx.fillRect(x, y, width, height);
 
-    ctx.fillStyle = frameTextColor;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    if (hasText) {
+      ctx.fillStyle = frameTextColor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
-    if (direction === "vertical") {
-      ctx.save();
+      if (direction === "vertical") {
+        ctx.save();
 
-      ctx.translate(
-        Math.round(x + width / 2),
-        Math.round(y + height / 2)
-      );
+        ctx.translate(
+          Math.round(x + width / 2),
+          Math.round(y + height / 2)
+        );
 
-      ctx.rotate(Math.PI / 2 * rotation);
+        ctx.rotate(Math.PI / 2 * rotation);
 
-      ctx.font = getTextFont(
-        fitText(ctx, frameText, height - 40, width * 0.42)
-      );
+        ctx.font = getTextFont(
+          fitText(ctx, frameText, height - 40, width * 0.42)
+        );
 
-      ctx.fillText(frameText, 0, 0);
+        ctx.fillText(frameText, 0, 0);
 
-      ctx.restore();
-    } else {
-      ctx.font = getTextFont(
-        fitText(ctx, frameText, width - 40, height * 0.42)
-      );
+        ctx.restore();
+      } else {
+        ctx.font = getTextFont(
+          fitText(ctx, frameText, width - 40, height * 0.42)
+        );
 
-      ctx.fillText(
-        frameText,
-        Math.round(x + width / 2),
-        Math.round(y + height / 2)
-      );
+        ctx.fillText(
+          frameText,
+          Math.round(x + width / 2),
+          Math.round(y + height / 2)
+        );
+      }
     }
   }
 
