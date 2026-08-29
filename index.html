@@ -1019,6 +1019,11 @@ input[type="range"] {
               <option value="1024">1024 px</option>
             </select>
           </div>
+
+          <label class="check" style="margin-top: 6px;">
+            <input id="rounded-frame" type="checkbox">
+            Cantos arredondados na imagem
+          </label>
         </div>
 
         <!-- Sub-card 2: Cores & Fundo -->
@@ -1124,11 +1129,6 @@ input[type="range"] {
                 </div>
               </div>
             </div>
-
-            <label class="check">
-              <input id="rounded-frame" type="checkbox">
-              Cantos arredondados da moldura
-            </label>
           </div>
         </div>
 
@@ -1724,17 +1724,18 @@ async function render() {
   const frameText = $("frame-text").value.trim() || "Acesse aqui";
   const roundedFrame = $("rounded-frame").checked;
 
+  if (roundedFrame) {
+    const cornerRadius = Math.max(16, Math.round(Math.min(layout.width, layout.height) * 0.06));
+    ctx.save();
+    roundedRect(ctx, 0, 0, layout.width, layout.height, cornerRadius);
+    ctx.clip();
+  }
+
   if (frame === "none") {
     ctx.drawImage(qrCanvas, 0, 0, size, size);
   } else if (layout.full) {
     ctx.fillStyle = frameColor;
-
-    if (roundedFrame) {
-      roundedRect(ctx, 0, 0, layout.width, layout.height, 26);
-      ctx.fill();
-    } else {
-      ctx.fillRect(0, 0, layout.width, layout.height);
-    }
+    ctx.fillRect(0, 0, layout.width, layout.height);
 
     ctx.drawImage(qrCanvas, layout.qrX, layout.qrY, size, size);
 
@@ -1760,13 +1761,7 @@ async function render() {
     const [x, y, width, height, direction, rotation] = layout.bar;
 
     ctx.fillStyle = frameColor;
-
-    if (roundedFrame) {
-      roundedRect(ctx, x, y, width, height, 16);
-      ctx.fill();
-    } else {
-      ctx.fillRect(x, y, width, height);
-    }
+    ctx.fillRect(x, y, width, height);
 
     ctx.fillStyle = frameTextColor;
     ctx.textAlign = "center";
@@ -1800,6 +1795,10 @@ async function render() {
         Math.round(y + height / 2)
       );
     }
+  }
+
+  if (roundedFrame) {
+    ctx.restore();
   }
 
   $("info").textContent =
