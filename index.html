@@ -717,9 +717,6 @@ const actions = $("actions");
 const GAP = 10;
 const FONT_FAMILY = 'Helvetica, "Helvetica Neue", Arial, sans-serif';
 
-const ICON_BORDER_BASE_QR_SIZE = 125;
-const ICON_BORDER_BASE_THICKNESS = 2;
-
 let size = 500;
 let fg = "#000000";
 let bg = "#FFFFFF";
@@ -773,31 +770,6 @@ function getDefaultFrameThickness(qrSize = size) {
 
 function getTextFont(fontSize) {
   return `700 ${Math.round(fontSize)}px ${FONT_FAMILY}`;
-}
-
-function getIconBorderThickness() {
-  return Math.max(
-    ICON_BORDER_BASE_THICKNESS,
-    Math.round(
-      (size / ICON_BORDER_BASE_QR_SIZE) *
-      ICON_BORDER_BASE_THICKNESS
-    )
-  );
-}
-
-function getIconContentPadding() {
-  const paddingBySize = {
-    125: 2,
-    250: 6,
-    375: 9,
-    500: 12,
-    625: 15,
-    750: 18,
-    875: 21,
-    1000: 24
-  };
-
-  return paddingBySize[size] ?? 12;
 }
 
 function isHex(value) {
@@ -1120,104 +1092,58 @@ async function fetchSvgAsImage(network) {
   });
 }
 
-function drawIconFrameShape(context, x, y, width, height, style, layer) {
-  const centerX = x + width / 2;
-  const centerY = y + height / 2;
-
-  if (style === "circle" || style === "dot") {
-    context.beginPath();
-    context.arc(
-      centerX,
-      centerY,
-      Math.min(width, height) / 2,
-      0,
-      Math.PI * 2
-    );
-    context.closePath();
-    return;
-  }
-
-  if (style === "rounded") {
-    roundedRect(
-      context,
-      x,
-      y,
-      width,
-      height,
-      layer === "outer" ? width * 0.26 : width * 0.22
-    );
-    return;
-  }
-
-  if (style === "soft") {
-    roundedRect(
-      context,
-      x,
-      y,
-      width,
-      height,
-      layer === "outer" ? width * 0.14 : width * 0.11
-    );
-    return;
-  }
-
-  roundedRect(context, x, y, width, height, 0);
-}
-
 async function drawSocialIcon(context) {
   if (!$("icon-enabled").checked) return;
 
   const network = SOCIAL_NETWORKS[selectedSocial];
-
   if (!network) return;
-
-  const pixelStyle = $("style").value;
-
-  const iconSize = Math.round(size * 0.20);
-
-  /*
-    Só existe borda branca externa.
-    A moldura preta interna foi removida.
-  */
-  const whiteBorder = getIconBorderThickness();
-  const contentPadding = getIconContentPadding();
-
-  const totalPadding =
-    whiteBorder +
-    contentPadding;
-
-  const outerSize =
-    iconSize +
-    totalPadding * 2;
-
-  const center = size / 2;
-  const outerX = Math.round(center - outerSize / 2);
-  const outerY = Math.round(center - outerSize / 2);
-
-  context.fillStyle = "#FFFFFF";
-
-  drawIconFrameShape(
-    context,
-    outerX,
-    outerY,
-    outerSize,
-    outerSize,
-    pixelStyle,
-    "outer"
-  );
-
-  context.fill();
 
   try {
     const image = await fetchSvgAsImage(network);
 
-    context.drawImage(
-      image,
-      Math.round(center - iconSize / 2),
-      Math.round(center - iconSize / 2),
-      iconSize,
-      iconSize
-    );
+    const iconSize = Math.round(size * 0.20);
+    const borderThickness = getMargin();
+    const pad = borderThickness + 4;
+    const canvasSize = iconSize + pad * 2;
+
+    // 1. Criar canvas de máscara com o formato exato da silhueta do ícone em branco
+    const maskCanvas = document.createElement("canvas");
+    maskCanvas.width = canvasSize;
+    maskCanvas.height = canvasSize;
+    const maskCtx = maskCanvas.getContext("2d");
+
+    maskCtx.drawImage(image, pad, pad, iconSize, iconSize);
+    maskCtx.globalCompositeOperation = "source-in";
+    maskCtx.fillStyle = "#FFFFFF";
+    maskCtx.fillRect(0, 0, canvasSize, canvasSize);
+
+    // 2. Criar canvas do contorno com dilatação radial precisa (seguindo a silhueta)
+    const outlineCanvas = document.createElement("canvas");
+    outlineCanvas.width = canvasSize;
+    outlineCanvas.height = canvasSize;
+    const outlineCtx = outlineCanvas.getContext("2d");
+
+    // Dilatação radial em passos de 1px cobrindo 360 graus com a mesma espessura da margem do QR code
+    for (let r = 1; r <= borderThickness; r += 1) {
+      const angleSteps = Math.max(12, Math.ceil(r * 6));
+      for (let i = 0; i < angleSteps; i++) {
+        const angle = (i * 2 * Math.PI) / angleSteps;
+        const dx = r * Math.cos(angle);
+        const dy = r * Math.sin(angle);
+        outlineCtx.drawImage(maskCanvas, dx, dy);
+      }
+    }
+    outlineCtx.drawImage(maskCanvas, 0, 0);
+
+    // 3. Desenhar o ícone original colorido por cima do contorno da silhueta branca
+    outlineCtx.drawImage(image, pad, pad, iconSize, iconSize);
+
+    // 4. Desenhar o resultado final perfeitamente centralizado no QR Code
+    const center = size / 2;
+    const drawX = Math.round(center - canvasSize / 2);
+    const drawY = Math.round(center - canvasSize / 2);
+
+    context.drawImage(outlineCanvas, drawX, drawY);
   } catch {
     /* Mantém o QR funcional se algum ícone não carregar. */
   }

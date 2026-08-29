@@ -35,7 +35,7 @@ Um **Gerador de QR Code** moderno, responsivo, gratuito e **100% executado local
   - Opção de cantos arredondados.
 - 🌐 **Ícones de Redes Sociais Embutidos:**
   - Adicione logos oficiais sobre o centro do QR Code: WhatsApp, Instagram, YouTube, Facebook, LinkedIn, X, Telegram, TikTok, Discord e Threads.
-  - Borda de proteção branca com escala automática proporcional ao tamanho escolhido.
+  - Contorno de proteção em silhueta (*outline*) com a mesma espessura da margem do QR Code, acompanhando o formato exato de cada ícone.
   - Elevação automática da correção de erro para **H (Alta - 30%)** ao ativar ícone, garantindo 100% de legibilidade do QR Code.
 - 🎯 **Controle de Correção de Erro (ECC):**
   - **L** (Baixa ~7%)
