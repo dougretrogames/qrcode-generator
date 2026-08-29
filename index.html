@@ -1637,6 +1637,85 @@ function fetchCustomImage() {
   });
 }
 
+function fillInteriorHoles(imageData, width, height) {
+  const data = imageData.data;
+  const totalPixels = width * height;
+  const visited = new Uint8Array(totalPixels);
+  const queue = new Int32Array(totalPixels);
+  let head = 0;
+  let tail = 0;
+
+  for (let x = 0; x < width; x++) {
+    const topIdx = x;
+    const botIdx = (height - 1) * width + x;
+    if (data[topIdx * 4 + 3] === 0 && !visited[topIdx]) {
+      visited[topIdx] = 1;
+      queue[tail++] = topIdx;
+    }
+    if (data[botIdx * 4 + 3] === 0 && !visited[botIdx]) {
+      visited[botIdx] = 1;
+      queue[tail++] = botIdx;
+    }
+  }
+
+  for (let y = 0; y < height; y++) {
+    const leftIdx = y * width;
+    const rightIdx = y * width + (width - 1);
+    if (data[leftIdx * 4 + 3] === 0 && !visited[leftIdx]) {
+      visited[leftIdx] = 1;
+      queue[tail++] = leftIdx;
+    }
+    if (data[rightIdx * 4 + 3] === 0 && !visited[rightIdx]) {
+      visited[rightIdx] = 1;
+      queue[tail++] = rightIdx;
+    }
+  }
+
+  while (head < tail) {
+    const idx = queue[head++];
+    const x = idx % width;
+    const y = Math.floor(idx / width);
+
+    if (x > 0) {
+      const nIdx = idx - 1;
+      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+        visited[nIdx] = 1;
+        queue[tail++] = nIdx;
+      }
+    }
+    if (x < width - 1) {
+      const nIdx = idx + 1;
+      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+        visited[nIdx] = 1;
+        queue[tail++] = nIdx;
+      }
+    }
+    if (y > 0) {
+      const nIdx = idx - width;
+      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+        visited[nIdx] = 1;
+        queue[tail++] = nIdx;
+      }
+    }
+    if (y < height - 1) {
+      const nIdx = idx + width;
+      if (!visited[nIdx] && data[nIdx * 4 + 3] === 0) {
+        visited[nIdx] = 1;
+        queue[tail++] = nIdx;
+      }
+    }
+  }
+
+  for (let i = 0; i < totalPixels; i++) {
+    if (!visited[i]) {
+      data[i * 4] = 255;
+      data[i * 4 + 1] = 255;
+      data[i * 4 + 2] = 255;
+      data[i * 4 + 3] = 255;
+    }
+  }
+}
+
 async function drawSocialIcon(context) {
   if (!$("icon-enabled").checked) return;
 
@@ -1714,9 +1793,11 @@ async function drawSocialIcon(context) {
       const maskCtx = maskCanvas.getContext("2d");
 
       maskCtx.drawImage(image, pad, pad, iconW, iconH);
-      maskCtx.globalCompositeOperation = "source-in";
-      maskCtx.fillStyle = "#FFFFFF";
-      maskCtx.fillRect(0, 0, canvasW, canvasH);
+
+      // Preenche 100% de branco sólido todo o interior, furos e cavidades sob o ícone
+      const maskImgData = maskCtx.getImageData(0, 0, canvasW, canvasH);
+      fillInteriorHoles(maskImgData, canvasW, canvasH);
+      maskCtx.putImageData(maskImgData, 0, 0);
 
       for (let r = 1; r <= borderThickness; r += 1) {
         const angleSteps = Math.max(12, Math.ceil(r * 6));
