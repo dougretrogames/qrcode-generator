@@ -1685,79 +1685,52 @@ function fetchCustomImage() {
   });
 }
 
-function fillInteriorHoles(imageData, width, height) {
+function createSolidSilhouette(imageData, width, height) {
   const data = imageData.data;
-  const totalPixels = width * height;
-  const visited = new Uint8Array(totalPixels);
-  const queue = new Int32Array(totalPixels);
-  let head = 0;
-  let tail = 0;
+  const solidMap = new Uint8Array(width * height);
 
-  const isTransparent = idx => data[idx * 4 + 3] <= 25;
-
-  for (let x = 0; x < width; x++) {
-    const topIdx = x;
-    const botIdx = (height - 1) * width + x;
-    if (isTransparent(topIdx) && !visited[topIdx]) {
-      visited[topIdx] = 1;
-      queue[tail++] = topIdx;
-    }
-    if (isTransparent(botIdx) && !visited[botIdx]) {
-      visited[botIdx] = 1;
-      queue[tail++] = botIdx;
+  for (let i = 0; i < width * height; i++) {
+    if (data[i * 4 + 3] > 20) {
+      solidMap[i] = 1;
     }
   }
 
+  const hSpanMap = new Uint8Array(width * height);
   for (let y = 0; y < height; y++) {
-    const leftIdx = y * width;
-    const rightIdx = y * width + (width - 1);
-    if (isTransparent(leftIdx) && !visited[leftIdx]) {
-      visited[leftIdx] = 1;
-      queue[tail++] = leftIdx;
-    }
-    if (isTransparent(rightIdx) && !visited[rightIdx]) {
-      visited[rightIdx] = 1;
-      queue[tail++] = rightIdx;
-    }
-  }
-
-  while (head < tail) {
-    const idx = queue[head++];
-    const x = idx % width;
-    const y = Math.floor(idx / width);
-
-    if (x > 0) {
-      const nIdx = idx - 1;
-      if (!visited[nIdx] && isTransparent(nIdx)) {
-        visited[nIdx] = 1;
-        queue[tail++] = nIdx;
+    let minX = -1;
+    let maxX = -1;
+    for (let x = 0; x < width; x++) {
+      if (solidMap[y * width + x]) {
+        if (minX === -1) minX = x;
+        maxX = x;
       }
     }
-    if (x < width - 1) {
-      const nIdx = idx + 1;
-      if (!visited[nIdx] && isTransparent(nIdx)) {
-        visited[nIdx] = 1;
-        queue[tail++] = nIdx;
-      }
-    }
-    if (y > 0) {
-      const nIdx = idx - width;
-      if (!visited[nIdx] && isTransparent(nIdx)) {
-        visited[nIdx] = 1;
-        queue[tail++] = nIdx;
-      }
-    }
-    if (y < height - 1) {
-      const nIdx = idx + width;
-      if (!visited[nIdx] && isTransparent(nIdx)) {
-        visited[nIdx] = 1;
-        queue[tail++] = nIdx;
+    if (minX !== -1) {
+      for (let x = minX; x <= maxX; x++) {
+        hSpanMap[y * width + x] = 1;
       }
     }
   }
 
-  for (let i = 0; i < totalPixels; i++) {
-    if (!visited[i]) {
+  const vSpanMap = new Uint8Array(width * height);
+  for (let x = 0; x < width; x++) {
+    let minY = -1;
+    let maxY = -1;
+    for (let y = 0; y < height; y++) {
+      if (solidMap[y * width + x]) {
+        if (minY === -1) minY = y;
+        maxY = y;
+      }
+    }
+    if (minY !== -1) {
+      for (let y = minY; y <= maxY; y++) {
+        vSpanMap[y * width + x] = 1;
+      }
+    }
+  }
+
+  for (let i = 0; i < width * height; i++) {
+    if (hSpanMap[i] && vSpanMap[i]) {
       data[i * 4] = 255;
       data[i * 4 + 1] = 255;
       data[i * 4 + 2] = 255;
@@ -1820,56 +1793,34 @@ async function drawSocialIcon(context) {
 
     outlineCtx.fillStyle = "#FFFFFF";
 
-    // 1. Fundo branco sob o ícone (respiro e eliminação de vazamentos)
-    if (selectedSocial === "facebook" || selectedSocial === "telegram") {
-      // Fundo circular concêntrico com respiro branco
-      const cx = pad + iconW / 2;
-      const cy = pad + iconH / 2;
-      const radius = iconW / 2 + borderThickness;
-      outlineCtx.beginPath();
-      outlineCtx.arc(cx, cy, radius, 0, Math.PI * 2);
-      outlineCtx.fill();
-    } else if (selectedSocial === "instagram") {
-      // Fundo arredondado da câmera com respiro branco
-      roundedRect(
-        outlineCtx,
-        pad - borderThickness,
-        pad - borderThickness,
-        iconW + borderThickness * 2,
-        iconH + borderThickness * 2,
-        (iconW + borderThickness * 2) * 0.26
-      );
-      outlineCtx.fill();
-    } else {
-      // Para ícones com silhueta contornada uniforme (YouTube, WhatsApp, X, TikTok, LinkedIn, Discord, Threads, Personalizado):
-      const maskCanvas = document.createElement("canvas");
-      maskCanvas.width = canvasW;
-      maskCanvas.height = canvasH;
-      const maskCtx = maskCanvas.getContext("2d");
+    // 1. Camada de silhueta 100% preenchida de branco sólido por baixo do ícone
+    const maskCanvas = document.createElement("canvas");
+    maskCanvas.width = canvasW;
+    maskCanvas.height = canvasH;
+    const maskCtx = maskCanvas.getContext("2d");
 
-      maskCtx.drawImage(image, pad, pad, iconW, iconH);
+    maskCtx.drawImage(image, pad, pad, iconW, iconH);
 
-      // Preenche 100% de branco sólido todo o interior, furos e cavidades sob o ícone
-      const maskImgData = maskCtx.getImageData(0, 0, canvasW, canvasH);
-      fillInteriorHoles(maskImgData, canvasW, canvasH);
-      maskCtx.putImageData(maskImgData, 0, 0);
+    const maskImgData = maskCtx.getImageData(0, 0, canvasW, canvasH);
+    createSolidSilhouette(maskImgData, canvasW, canvasH);
+    maskCtx.putImageData(maskImgData, 0, 0);
 
-      for (let r = 1; r <= borderThickness; r += 1) {
-        const angleSteps = Math.max(12, Math.ceil(r * 6));
-        for (let i = 0; i < angleSteps; i++) {
-          const angle = (i * 2 * Math.PI) / angleSteps;
-          const dx = r * Math.cos(angle);
-          const dy = r * Math.sin(angle);
-          outlineCtx.drawImage(maskCanvas, dx, dy);
-        }
+    // 2. Traçar/dilatar a borda da silhueta branca uniforme ao redor
+    for (let r = 1; r <= borderThickness; r += 1) {
+      const angleSteps = Math.max(16, Math.ceil(r * 8));
+      for (let i = 0; i < angleSteps; i++) {
+        const angle = (i * 2 * Math.PI) / angleSteps;
+        const dx = r * Math.cos(angle);
+        const dy = r * Math.sin(angle);
+        outlineCtx.drawImage(maskCanvas, dx, dy);
       }
-      outlineCtx.drawImage(maskCanvas, 0, 0);
     }
+    outlineCtx.drawImage(maskCanvas, 0, 0);
 
-    // 2. Desenhar o ícone oficial intacto e colorido por cima
+    // 3. Desenhar o ícone colorido/original por cima da camada de fundo branca sólida
     outlineCtx.drawImage(image, pad, pad, iconW, iconH);
 
-    // 3. Desenhar o resultado final perfeitamente centralizado no QR Code
+    // 4. Centralizar o resultado no QR Code
     const center = size / 2;
     const drawX = Math.round(center - canvasW / 2);
     const drawY = Math.round(center - canvasH / 2);
